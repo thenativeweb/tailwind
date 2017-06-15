@@ -1,0 +1,61 @@
+{
+  "name": "tailwind",
+  "version": "0.0.0",
+  "description": "tailwind is a base module for streaming and evented CQS applications.",
+  "contributors": [
+    {
+      "name": "Golo Roden",
+      "email": "golo.roden@thenativeweb.io"
+    },
+    {
+      "name": "Matthias Wagler",
+      "email": "matthias.wagler@thenativeweb.io"
+    }
+  ],
+  "main": "lib/tailwind.js",
+  "dependencies": {
+    "ajv": "5.1.5",
+    "app-root-path": "2.0.1",
+    "async": "2.4.1",
+    "body-parser": "1.17.2",
+    "commands-events": "1.0.0",
+    "cors": "2.8.3",
+    "crypto2": "0.3.2",
+    "datasette": "0.3.4",
+    "draht": "0.4.2",
+    "express": "4.15.3",
+    "flaschenpost": "0.15.6",
+    "hase": "0.5.4",
+    "json-lines": "0.4.3",
+    "limes": "0.5.0",
+    "lodash": "4.17.4",
+    "lusca": "1.4.1",
+    "media-typer": "0.3.0",
+    "morgan": "1.8.2",
+    "nocache": "2.0.0",
+    "partof": "0.1.0",
+    "processenv": "0.1.1",
+    "spdy": "3.4.7",
+    "stethoskop": "0.2.0",
+    "timer2": "0.2.3",
+    "uuidv4": "0.5.0",
+    "ws": "3.0.0"
+  },
+  "devDependencies": {
+    "amqplib": "0.5.1",
+    "assertthat": "0.9.0",
+    "json-lines-client": "0.7.9",
+    "needle": "1.6.0",
+    "nodeenv": "0.2.1",
+    "retry": "0.10.1",
+    "roboter": "0.15.2",
+    "roboter-server": "0.15.2",
+    "shelljs": "0.7.8"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/thenativeweb/tailwind.git"
+  },
+  "keywords": [],
+  "license": "AGPL-3.0"
+}

@@ -1,0 +1,136 @@
+'use strict';
+
+const path = require('path');
+
+const assert = require('assertthat'),
+      async = require('async'),
+      shell = require('shelljs');
+
+const env = require('../../../helpers/env'),
+      tailwind = require('../../../../lib/tailwind'),
+      waitForRabbitMq = require('../../../helpers/waitForRabbitMq');
+
+suite('flowbus', () => {
+  suite('amqp', () => {
+    let appReceiver,
+        appSender;
+
+    setup(done => {
+      appSender = tailwind.createApp({
+        keys: path.join(__dirname, '..', '..', '..', 'keys'),
+        identityProvider: {
+          name: 'auth.wolkenkit.io',
+          certificate: path.join(__dirname, '..', '..', '..', 'keys', 'certificate.pem')
+        }
+      });
+      appReceiver = tailwind.createApp({
+        keys: path.join(__dirname, '..', '..', '..', 'keys'),
+        identityProvider: {
+          name: 'auth.wolkenkit.io',
+          certificate: path.join(__dirname, '..', '..', '..', 'keys', 'certificate.pem')
+        }
+      });
+
+      async.series([
+        callback => {
+          appReceiver.run([
+            cb => {
+              appReceiver.flowbus.use(new appReceiver.wires.flowbus.amqp.Receiver({
+                url: env.RABBITMQ_URL,
+                application: 'Plcr'
+              }), cb);
+            },
+            () => {
+              callback(null);
+            }
+          ]);
+        },
+        callback => {
+          appSender.run([
+            cb => {
+              appSender.flowbus.use(new appSender.wires.flowbus.amqp.Sender({
+                url: env.RABBITMQ_URL,
+                application: 'Plcr'
+              }), cb);
+            },
+            () => {
+              callback(null);
+            }
+          ]);
+        }
+      ], err => {
+        if (err) {
+          return done(err);
+        }
+        done();
+      });
+    });
+
+    test('sends and receives events.', function (done) {
+      this.timeout(20 * 1000);
+
+      const event = new appSender.Event({
+        context: {
+          name: 'Planning'
+        },
+        aggregate: {
+          name: 'PeerGroup',
+          id: 'dfa1c416-32e6-431a-8d65-27ba0fc3e978'
+        },
+        name: 'Joined',
+        data: {
+          foo: 'foobar'
+        },
+        metadata: {
+          correlationId: 'bb49053c-66ba-4dd9-8eab-b1f69985248c',
+          causationId: 'bb49053c-66ba-4dd9-8eab-b1f69985248c'
+        }
+      });
+
+      appReceiver.flowbus.incoming.once('data', actual => {
+        actual.next();
+        assert.that(actual.context.name).is.equalTo(event.context.name);
+        assert.that(actual.aggregate.name).is.equalTo(event.aggregate.name);
+        assert.that(actual.aggregate.id).is.equalTo(event.aggregate.id);
+        assert.that(actual.name).is.equalTo(event.name);
+        assert.that(actual.id).is.equalTo(event.id);
+        assert.that(actual.data).is.equalTo(event.data);
+        assert.that(actual.metadata.correlationId).is.equalTo(event.metadata.correlationId);
+        assert.that(actual.metadata.causationId).is.equalTo(event.metadata.causationId);
+        done();
+      });
+
+      appSender.flowbus.outgoing.write(event);
+    });
+
+    suite('incoming', () => {
+      test('emits a disconnect event when the wire has been disconnected.', function (done) {
+        this.timeout(15 * 1000);
+
+        appReceiver.flowbus.incoming.once('disconnect', () => {
+          shell.exec('docker start rabbitmq', exitCode => {
+            assert.that(exitCode).is.equalTo(0);
+            waitForRabbitMq(done);
+          });
+        });
+
+        shell.exec('docker kill rabbitmq');
+      });
+    });
+
+    suite('outgoing', () => {
+      test('emits a disconnect event when the wire has been disconnected.', function (done) {
+        this.timeout(15 * 1000);
+
+        appSender.flowbus.outgoing.once('disconnect', () => {
+          shell.exec('docker start rabbitmq', exitCode => {
+            assert.that(exitCode).is.equalTo(0);
+            waitForRabbitMq(done);
+          });
+        });
+
+        shell.exec('docker kill rabbitmq');
+      });
+    });
+  });
+});
