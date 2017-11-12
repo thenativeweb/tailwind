@@ -44,7 +44,7 @@ tailwind is a base module for streaming and evented CQS applications.
 
 ## Installation
 
-```bash
+```shell
 $ npm install tailwind
 ```
 
@@ -429,7 +429,7 @@ To cancel reading a model before the `finish` event was sent, send a message wit
 
 To build this module use [roboter](https://www.npmjs.com/package/roboter).
 
-```bash
+```shell
 $ bot
 ```
 
