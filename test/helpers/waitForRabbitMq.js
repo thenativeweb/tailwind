@@ -1,31 +1,15 @@
 'use strict';
 
-const amqp = require('amqplib/callback_api'),
-      retry = require('retry');
+const amqp = require('amqplib'),
+      retry = require('async-retry');
 
 const env = require('./env');
 
-const waitForRabbitMq = function (callback) {
-  const operation = retry.operation();
+const waitForRabbitMq = async function () {
+  await retry(async () => {
+    const connection = await amqp.connect(env.RABBITMQ_URL, {});
 
-  operation.attempt(() => {
-    amqp.connect(env.RABBITMQ_URL, {}, (err, connection) => {
-      if (operation.retry(err)) {
-        return;
-      }
-
-      if (err) {
-        return callback(operation.mainError());
-      }
-
-      connection.close(errClose => {
-        if (errClose) {
-          return callback(errClose);
-        }
-
-        callback(null);
-      });
-    });
+    await connection.close();
   });
 };
 

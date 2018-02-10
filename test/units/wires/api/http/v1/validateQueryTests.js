@@ -5,20 +5,18 @@ const assert = require('assertthat');
 const validateQuery = require('../../../../../../lib/wires/api/http/v1/validateQuery');
 
 suite('validateQuery', () => {
-  test('is a function.', done => {
+  test('is a function.', async () => {
     assert.that(validateQuery).is.ofType('function');
-    done();
   });
 
-  test('throws an error if query is missing.', done => {
+  test('throws an error if query is missing.', async () => {
     assert.that(() => {
       validateQuery();
     }).is.throwing('Query is missing.');
-    done();
   });
 
   suite('orderBy', () => {
-    test('is valid when value of orderBy is asc, ascending, desc or descending.', done => {
+    test('is valid when value of orderBy is asc, ascending, desc or descending.', async () => {
       assert.that(() => {
         validateQuery({
           orderBy: {
@@ -29,10 +27,9 @@ suite('validateQuery', () => {
           }
         });
       }).is.not.throwing();
-      done();
     });
 
-    test('is invalid when value of orderBy is not asc, ascending, desc or descending.', done => {
+    test('is invalid when value of orderBy is not asc, ascending, desc or descending.', async () => {
       assert.that(() => {
         validateQuery({
           orderBy: {
@@ -40,7 +37,6 @@ suite('validateQuery', () => {
           }
         });
       }).is.throwing('Invalid query.');
-      done();
     });
   });
 });
