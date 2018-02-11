@@ -10,7 +10,7 @@ const buildEvent = require('../../../../helpers/buildEvent'),
       issueToken = require('../../../../helpers/issueToken'),
       startApp = require('./startApp');
 
-suite.only('wsServer', () => {
+suite('wsServer', () => {
   suiteSetup(() => {
     // Disable SSL certificate checks to allow running these tests with a
     // self-signed certificate.
@@ -1920,14 +1920,19 @@ suite.only('wsServer', () => {
                     statusCode: 200
                   });
 
-                  fakeStream.once('error', err => {
-                    try {
-                      assert.that(err.message).is.equalTo('write after end');
-                    } catch (ex) {
-                      return reject(ex);
-                    }
-                    resolve();
-                  }).write({ foo: 'bar' });
+                  (async () => {
+                    // Wait a short time to give the stream the chance to close.
+                    await new Promise(resolveTimeout => setTimeout(resolveTimeout, 0.1 * 1000));
+
+                    fakeStream.once('error', err => {
+                      try {
+                        assert.that(err.message).is.equalTo('write after end');
+                      } catch (ex) {
+                        return reject(ex);
+                      }
+                      resolve();
+                    }).write({ foo: 'bar' });
+                  })();
                   break;
                 }
                 default: {
