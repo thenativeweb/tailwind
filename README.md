@@ -50,13 +50,13 @@ $ npm install tailwind
 
 ## Quick start
 
-First you need to add a reference to tailwind to your application.
+First you need to add a reference to tailwind to your application:
 
 ```javascript
 const tailwind = require('tailwind');
 ```
 
-Now you can create an actual application by calling the `createApp` function. Additionally, you may want to specify the name and the certificate of an identity provider to use. The name has to match the `issuer` property of the tokens the identity provider issues.
+Now you can create an actual application by calling the `createApp` function. Additionally, you may want to specify the name and the certificate of an identity provider to use. The name has to match the `issuer` property of the tokens the identity provider issues:
 
 ```javascript
 const app = tailwind.createApp({
@@ -67,7 +67,7 @@ const app = tailwind.createApp({
 });
 ```
 
-Once you have done all this, whenever you need a reference to the application, just call the `app` function.
+Once you have done all this, whenever you need a reference to the application, just call the `app` function:
 
 ```javascript
 const app = tailwind.app();
@@ -77,7 +77,7 @@ Basically, no matter what kind of application you create, the application's stru
 
 ### Enable profiling
 
-If you want to profile your application, additionally provide the `profiling` options with the host and the port of a StatsD server.
+If you want to profile your application, additionally provide the `profiling` options with the host and the port of a StatsD server:
 
 ```javascript
 const app = tailwind.createApp({
@@ -88,79 +88,45 @@ const app = tailwind.createApp({
 });
 ```
 
-### Running the application
-
-Call `app.run` to execute the actual application code.
-
-```javascript
-app.run(() => {
-  // ...
-});
-```
-
-### Configuring an application
-
-If you need to run setup tasks before running the application, hand over an array to the `app.run` function with asynchronous setup functions. This can be used, e.g., to connect to databases or setup I/O ports. All these functions are being run sequentially.
-
-#### Configuring I/O ports
+### Configuring I/O ports
 
 At the moment, there are four I/O ports available, `app.api`, `app.commandbus`, `app.eventbus`, and `app.flowbus`. To use them, you need to connect them with wires to protocols and ports. For that use an I/O ports `use` function and provide a wire instance.
 
 Currently, there are four wires available: `app.wires.api.http`, `app.wires.commandbus.amqp`, `app.wires.eventbus.amqp`, and `app.wires.flowbus.amqp`. While the first one only provides a generic `Server`, the latter ones provide a `Receiver` and a `Sender`, each.
 
-So, basically, the syntax is as folows.
+So, basically, the syntax is as folows:
 
 ```javascript
-app.run([
-  done => {
-    app.api.use(new app.wires.api.http.Server({
-      // ...
-    }), done);
-  },
-  () => {
-    // ...
-  }
-]);
+await app.api.use(new app.wires.api.http.Server({
+  // ...
+}));
 ```
 
 The parameters you have to hand over depend on the actual wire.
 
 #### Configuring the API server
 
-If you want to create an API I/O port which is based on `http` you have to use code similar to the following.
+If you want to create an API I/O port which is based on `http` you have to use code similar to the following:
 
 ```javascript
-app.run([
-  done => {
-    app.api.use(new app.wires.api.http.Server({
-      keys: path.join(__dirname, 'keys'),
-      clientRegistry: 'wolkenkit',
-      host: 'sample.wolkenkit.io',
-      port: 3000,
-      corsOrigin: '*',
-      writeModel: {
-        network: {
-          node: {
-            commands: {
-              ping: {}
-            },
-            events: {
-              pinged: {}
-            }
-          }
-        }
-      },
-      readModel: {
-        lists: {
-          pings: {}
-        }
+await app.api.use(new app.wires.api.http.Server({
+  keys: path.join(__dirname, 'keys'),
+  clientRegistry: 'wolkenkit',
+  host: 'sample.wolkenkit.io',
+  port: 3000,
+  corsOrigin: '*',
+  writeModel: {
+    network: {
+      node: {
+        commands: { ping: {}},
+        events: { pinged: {}}
       }
-    }), done);
+    }
   },
-  () => {
-    // ...
+  readModel: {
+    lists: { pings: {}}
   }
-]);
+}));
 ```
 
 The parameters have the following meaning:
@@ -179,27 +145,20 @@ If you want to check whether the API server is reachable, try to access the `/v1
 
 #### Configuring the command bus, the event bus, and the flow bus
 
-Configuring one of the other wires is a little bit simpler. All you need to do is to create a new instance of the requested wire, and set the url of a RabbitMQ instance as well as the name of the application.
+Configuring one of the other wires is a little bit simpler. All you need to do is to create a new instance of the requested wire, and set the url of a RabbitMQ instance as well as the name of the application:
 
 ```javascript
-app.run([
-  done => {
-    app.commandbus.use(new app.wires.commandbus.amqp.Sender({
-      url: 'amqp://admin:admin@localhost:5672',
-      application: 'plcr'
-    }), done);
-  },
-  () => {
-    // ...
-  }
-]);
+await app.commandbus.use(new app.wires.commandbus.amqp.Sender({
+  url: 'amqp://admin:admin@localhost:5672',
+  application: 'plcr'
+}));
 ```
 
 ### Handling messages
 
 #### Receiving incoming messages
 
-To handle incoming messages, you need to subscribe to the `data` event of the `incoming` stream of the appropriate I/O port. The following example shows how to listen for incoming messages from the API I/O port.
+To handle incoming messages, you need to subscribe to the `data` event of the `incoming` stream of the appropriate I/O port. The following example shows how to listen for incoming messages from the API I/O port:
 
 ```javascript
 app.api.incoming.on('data', command => {
@@ -207,7 +166,7 @@ app.api.incoming.on('data', command => {
 });
 ```
 
-When you receive a message from the command or the event bus you have to call the message's `next` function to mark the message as handled.
+When you receive a message from the command bus, the event bus or the flow bus you have to call the message's `next` function to mark the message as handled:
 
 ```javascript
 app.commandbus.incoming.on('data', command => {
@@ -216,7 +175,7 @@ app.commandbus.incoming.on('data', command => {
 });
 ```
 
-If the message could not be handled successfully, instead of `next` either call `discard` to drop the message or call `defer` to requeue it.
+If the message could not be handled successfully, instead of `next` either call `discard` to drop the message or call `defer` to requeue it:
 
 ```javascript
 app.commandbus.incoming.on('data', command => {
@@ -227,7 +186,7 @@ app.commandbus.incoming.on('data', command => {
 
 #### Sending outgoing messages
 
-To send data using an I/O port, use its `outgoing` stream and call the `write` function.
+To send data using an I/O port, use its `outgoing` stream and call the `write` function:
 
 ```javascript
 app.commandbus.outgoing.write({
@@ -237,7 +196,7 @@ app.commandbus.outgoing.write({
 
 #### Handling stream errors
 
-Each stream of an I/O port provides an `error` event that you can subscribe to. This allows you to setup custom error handling code.
+Each stream of an I/O port provides an `error` event that you can subscribe to. This allows you to setup custom error handling code:
 
 ```javascript
 app.commandbus.outgoing.on('error', err => {
@@ -247,7 +206,7 @@ app.commandbus.outgoing.on('error', err => {
 
 #### Handling disconnects
 
-Each stream of an I/O port provides a `disconnect` event that you can subscribe to. This allows you to setup custom disconnection handling code.
+Each stream of an I/O port provides a `disconnect` event that you can subscribe to. This allows you to setup custom disconnection handling code:
 
 ```javascript
 app.commandbus.outgoing.on('disconnect', err => {
@@ -271,7 +230,7 @@ The `name` and `version` properties are read from your application's `package.js
 
 If you need to access environment variables use the `app.env` function and provide the key of the environment variable you're interested in. If the environment variable is not set, `app.env` returns `undefined`, otherwise it returns its value.
 
-If the value is a serialized JSON object, it becomes deserialized automatically, otherwise it gets returned as-is.
+If the value is a serialized JSON object, it becomes deserialized automatically, otherwise it gets returned as-is:
 
 ```javascript
 const port = app.env('PORT');
@@ -293,20 +252,20 @@ Additionally, the `app` object also provides a number of services that may be us
 
 - `app.services.bus` is a message bus, see [draht](https://github.com/thenativeweb/draht) for details. The `get` function is automaticalled called internally, so you don't have to create a new instance.
 - `app.services.crypto` provides functions for encrypting, decrypting, signing and verifying messages, see [crypto2](https://github.com/thenativeweb/crypto2) for details.
-- `app.services.datasette` is a key-value container, see [datasette](https://github.com/thenativeweb/datasette) for details.
-- `app.services.emitter` is an event emitter, see [draht](https://github.com/thenativeweb/draht) for details.
+- `app.services.Datasette` is a key-value container, see [datasette](https://github.com/thenativeweb/datasette) for details.
+- `app.services.Emitter` is an event emitter, see [draht](https://github.com/thenativeweb/draht) for details.
 - `app.services.getLogger` returns a logger, see [flaschenpost](https://github.com/thenativeweb/flaschenpost) for details.
 - `app.services.Timer` is a timer, see [timer2](https://github.com/thenativeweb/timer2) for details.
 
 #### Exiting an application
 
-To exit an application, call the `app.exit` function. Optionally you may specify an exit code.
+To exit an application, call the `app.exit` function. Optionally you may specify an exit code:
 
 ```javascript
 app.exit();
 ```
 
-If you want to log an error and exit, use the `app.fail` function and provide a message and the error as parameter.
+If you want to log an error and exit, use the `app.fail` function and provide a message and the error as parameter:
 
 ```javascript
 app.fail('Application failed.', new Error('...'));
@@ -314,16 +273,16 @@ app.fail('Application failed.', new Error('...'));
 
 ### Enabling queries on the server
 
-To enable querying models on the server, you need to provide a function that gets the data from the model and writes them to a stream. For that use the `app.api.read` hook.
+To enable querying models on the server, you need to provide a function that gets the data from the model and writes them to a stream. For that use the `app.api.read` hook:
 
 ```javascript
-app.api.read = function (modelType, modelName, options, callback) {
+app.api.read = async function (modelType, modelName, options) {
   // options.where
   // options.orderBy
   // options.skip
   // options.take
   // ...
-  // callback(err, stream);
+  // return stream;
 };
 ```
 
@@ -347,7 +306,7 @@ Optionally, you can send a number of query string parameters to specify a filter
 
 #### Specifying where clauses
 
-The `where` value must be a stringified JSON object encoded with `encodeURIComponent`. For the object itself, use the following format.
+The `where` value must be a stringified JSON object encoded with `encodeURIComponent`. For the object itself, use the following format:
 
 ```javascript
 const where = {
@@ -360,7 +319,7 @@ If `where` is not provided it defaults to `{}`.
 
 #### Specifying order by clauses
 
-The `orderBy` value must be a stringified JSON object encoded with `encodeURIComponent`. For the object itself, use the following format.
+The `orderBy` value must be a stringified JSON object encoded with `encodeURIComponent`. For the object itself, use the following format:
 
 ```javascript
 const orderBy = {
