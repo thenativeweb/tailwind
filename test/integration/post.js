@@ -4,12 +4,18 @@ const processenv = require('processenv'),
       shell = require('shelljs');
 
 const post = function (done) {
-  if (processenv('CIRCLECI')) {
-    // On CircleCI, we are not allowed to remove Docker containers.
-    return done(null);
-  }
+  (async () => {
+    try {
+      if (!processenv('CIRCLECI')) {
+        // On CircleCI, we are not allowed to remove Docker containers.
+        shell.exec('docker kill rabbitmq; docker rm -v rabbitmq');
+      }
 
-  shell.exec('docker kill rabbitmq; docker rm -v rabbitmq', done);
+      return done(null);
+    } catch (ex) {
+      return done(ex);
+    }
+  })();
 };
 
 module.exports = post;

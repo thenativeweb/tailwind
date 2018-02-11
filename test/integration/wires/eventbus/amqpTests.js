@@ -3,7 +3,6 @@
 const path = require('path');
 
 const assert = require('assertthat'),
-      async = require('async'),
       shell = require('shelljs');
 
 const env = require('../../../helpers/env'),
@@ -11,11 +10,13 @@ const env = require('../../../helpers/env'),
       waitForRabbitMq = require('../../../helpers/waitForRabbitMq');
 
 suite('eventbus', () => {
-  suite('amqp', () => {
+  suite('amqp', function () {
+    this.timeout(20 * 1000);
+
     let appReceiver,
         appSender;
 
-    setup(done => {
+    setup(async () => {
       appSender = tailwind.createApp({
         keys: path.join(__dirname, '..', '..', '..', 'keys'),
         identityProvider: {
@@ -23,6 +24,7 @@ suite('eventbus', () => {
           certificate: path.join(__dirname, '..', '..', '..', 'keys', 'certificate.pem')
         }
       });
+
       appReceiver = tailwind.createApp({
         keys: path.join(__dirname, '..', '..', '..', 'keys'),
         identityProvider: {
@@ -31,54 +33,23 @@ suite('eventbus', () => {
         }
       });
 
-      async.series([
-        callback => {
-          appReceiver.run([
-            cb => {
-              appReceiver.eventbus.use(new appReceiver.wires.eventbus.amqp.Receiver({
-                url: env.RABBITMQ_URL,
-                application: 'Plcr'
-              }), cb);
-            },
-            () => {
-              callback(null);
-            }
-          ]);
-        },
-        callback => {
-          appSender.run([
-            cb => {
-              appSender.eventbus.use(new appSender.wires.eventbus.amqp.Sender({
-                url: env.RABBITMQ_URL,
-                application: 'Plcr'
-              }), cb);
-            },
-            () => {
-              callback(null);
-            }
-          ]);
-        }
-      ], err => {
-        if (err) {
-          return done(err);
-        }
-        done();
-      });
+      await appReceiver.eventbus.use(new appReceiver.wires.eventbus.amqp.Receiver({
+        url: env.RABBITMQ_URL,
+        application: 'Plcr'
+      }));
+
+      await appSender.eventbus.use(new appSender.wires.eventbus.amqp.Sender({
+        url: env.RABBITMQ_URL,
+        application: 'Plcr'
+      }));
     });
 
     test('sends and receives events.', done => {
       const evt = new appSender.Event({
-        context: {
-          name: 'Planning'
-        },
-        aggregate: {
-          name: 'PeerGroup',
-          id: 'dfa1c416-32e6-431a-8d65-27ba0fc3e978'
-        },
+        context: { name: 'Planning' },
+        aggregate: { name: 'PeerGroup', id: 'dfa1c416-32e6-431a-8d65-27ba0fc3e978' },
         name: 'Joined',
-        data: {
-          foo: 'foobar'
-        },
+        data: { foo: 'foobar' },
         metadata: {
           correlationId: 'bb49053c-66ba-4dd9-8eab-b1f69985248c',
           causationId: 'bb49053c-66ba-4dd9-8eab-b1f69985248c'
@@ -102,14 +73,14 @@ suite('eventbus', () => {
     });
 
     suite('incoming', () => {
-      test('emits a disconnect event when the wire has been disconnected.', function (done) {
-        this.timeout(15 * 1000);
-
+      test('emits a disconnect event when the wire has been disconnected.', done => {
         appReceiver.eventbus.incoming.once('disconnect', () => {
-          shell.exec('docker start rabbitmq', exitCode => {
-            assert.that(exitCode).is.equalTo(0);
-            waitForRabbitMq(done);
-          });
+          shell.exec('docker start rabbitmq');
+
+          (async () => {
+            await waitForRabbitMq();
+            done();
+          })();
         });
 
         shell.exec('docker kill rabbitmq');
@@ -117,14 +88,14 @@ suite('eventbus', () => {
     });
 
     suite('outgoing', () => {
-      test('emits a disconnect event when the wire has been disconnected.', function (done) {
-        this.timeout(15 * 1000);
-
+      test('emits a disconnect event when the wire has been disconnected.', done => {
         appSender.eventbus.outgoing.once('disconnect', () => {
-          shell.exec('docker start rabbitmq', exitCode => {
-            assert.that(exitCode).is.equalTo(0);
-            waitForRabbitMq(done);
-          });
+          shell.exec('docker start rabbitmq');
+
+          (async () => {
+            await waitForRabbitMq();
+            done();
+          })();
         });
 
         shell.exec('docker kill rabbitmq');

@@ -13,6 +13,8 @@ const limes = new Limes({
   /* eslint-enable no-sync */
 });
 
-module.exports = function (subject, payload) {
+const issueToken = function (subject, payload) {
   return limes.issueTokenFor(subject, payload);
 };
+
+module.exports = issueToken;

@@ -11,25 +11,22 @@ suite('tailwind', () => {
     tailwind.destroyApp();
   });
 
-  test('is an object.', done => {
+  test('is an object.', async () => {
     assert.that(tailwind).is.ofType('object');
-    done();
   });
 
   suite('app', () => {
-    test('is a function.', done => {
+    test('is a function.', async () => {
       assert.that(tailwind.app).is.ofType('function');
-      done();
     });
 
-    test('throws an exception if no app has been defined yet.', done => {
+    test('throws an exception if no app has been defined yet.', async () => {
       assert.that(() => {
         tailwind.app();
       }).is.throwing();
-      done();
     });
 
-    test('returns the application once it has been defined.', done => {
+    test('returns the application once it has been defined.', async () => {
       tailwind.createApp({
         keys: path.join(__dirname, '..', 'keys'),
         identityProvider: {
@@ -41,10 +38,9 @@ suite('tailwind', () => {
       const app = tailwind.app();
 
       assert.that(app).is.ofType('object');
-      done();
     });
 
-    test('returns the same application when called multiple times.', done => {
+    test('returns the same application when called multiple times.', async () => {
       tailwind.createApp({
         keys: path.join(__dirname, '..', 'keys'),
         identityProvider: {
@@ -57,10 +53,9 @@ suite('tailwind', () => {
             secondApp = tailwind.app();
 
       assert.that(firstApp).is.sameAs(secondApp);
-      done();
     });
 
-    test('returns a new application when createApp was called in between.', done => {
+    test('returns a new application when createApp was called in between.', async () => {
       tailwind.createApp({
         keys: path.join(__dirname, '..', 'keys'),
         identityProvider: {
@@ -82,17 +77,15 @@ suite('tailwind', () => {
       const secondApp = tailwind.app();
 
       assert.that(firstApp).is.not.sameAs(secondApp);
-      done();
     });
   });
 
   suite('createApp', () => {
-    test('is a function.', done => {
+    test('is a function.', async () => {
       assert.that(tailwind.createApp).is.ofType('function');
-      done();
     });
 
-    test('returns the application.', done => {
+    test('returns the application.', async () => {
       const app = tailwind.createApp({
         keys: path.join(__dirname, '..', 'keys'),
         identityProvider: {
@@ -102,17 +95,15 @@ suite('tailwind', () => {
       });
 
       assert.that(app).is.ofType('object');
-      done();
     });
   });
 
   suite('destroyApp', () => {
-    test('is a function.', done => {
+    test('is a function.', async () => {
       assert.that(tailwind.destroyApp).is.ofType('function');
-      done();
     });
 
-    test('destroy an existing application.', done => {
+    test('destroy an existing application.', async () => {
       tailwind.createApp({
         keys: path.join(__dirname, '..', 'keys'),
         identityProvider: {
@@ -124,7 +115,6 @@ suite('tailwind', () => {
       assert.that(() => {
         tailwind.app();
       }).is.throwing();
-      done();
     });
   });
 });
