@@ -1,6 +1,18 @@
 'use strict';
 
-function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+var _keys = require('babel-runtime/core-js/object/keys');
+
+var _keys2 = _interopRequireDefault(_keys);
+
+var _regenerator = require('babel-runtime/regenerator');
+
+var _regenerator2 = _interopRequireDefault(_regenerator);
+
+var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
+
+var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var sendMessage = require('./wsSendMessage'),
     validateQuery = require('./validateQuery');
@@ -14,10 +26,10 @@ var postRead = {
     var app = _ref.app,
         message = _ref.message,
         readModel = _ref.readModel;
-    return _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4() {
+    return (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee4() {
       var logger, _message$payload, modelName, modelType, _message$payload$quer, query, _query$orderBy, orderBy, _query$skip, skip, _query$take, take, _query$where, where, authenticationWhere, stream, onData, onEnd, onError, unsubscribe;
 
-      return regeneratorRuntime.wrap(function _callee4$(_context4) {
+      return _regenerator2.default.wrap(function _callee4$(_context4) {
         while (1) {
           switch (_context4.prev = _context4.next) {
             case 0:
@@ -220,8 +232,8 @@ var postRead = {
               onData = function onData(data) {
                 var _this = this;
 
-                _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
-                  return regeneratorRuntime.wrap(function _callee$(_context) {
+                (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
+                  return _regenerator2.default.wrap(function _callee$(_context) {
                     while (1) {
                       switch (_context.prev = _context.next) {
                         case 0:
@@ -252,8 +264,8 @@ var postRead = {
                 var _this2 = this;
 
                 unsubscribe();
-                _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
-                  return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2() {
+                  return _regenerator2.default.wrap(function _callee2$(_context2) {
                     while (1) {
                       switch (_context2.prev = _context2.next) {
                         case 0:
@@ -284,8 +296,8 @@ var postRead = {
                 var _this3 = this;
 
                 unsubscribe();
-                _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3() {
-                  return regeneratorRuntime.wrap(function _callee3$(_context3) {
+                (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee3() {
+                  return _regenerator2.default.wrap(function _callee3$(_context3) {
                     while (1) {
                       switch (_context3.prev = _context3.next) {
                         case 0:
@@ -343,9 +355,9 @@ var postRead = {
 
     var app = _ref5.app,
         message = _ref5.message;
-    return _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5() {
+    return (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee5() {
       var logger, unsubscribe;
-      return regeneratorRuntime.wrap(function _callee5$(_context5) {
+      return _regenerator2.default.wrap(function _callee5$(_context5) {
         while (1) {
           switch (_context5.prev = _context5.next) {
             case 0:
@@ -418,7 +430,7 @@ var postRead = {
       return;
     }
 
-    Object.keys(subscriptions[socket.uniqueId]).forEach(function (procedureId) {
+    (0, _keys2.default)(subscriptions[socket.uniqueId]).forEach(function (procedureId) {
       var unsubscribe = subscriptions[socket.uniqueId][procedureId];
 
       unsubscribe();

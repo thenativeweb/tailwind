@@ -1,6 +1,18 @@
 'use strict';
 
-function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+var _keys = require('babel-runtime/core-js/object/keys');
+
+var _keys2 = _interopRequireDefault(_keys);
+
+var _regenerator = require('babel-runtime/regenerator');
+
+var _regenerator2 = _interopRequireDefault(_regenerator);
+
+var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
+
+var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var partOf = require('partof');
 
@@ -14,9 +26,9 @@ var postEvents = {
 
     var app = _ref.app,
         message = _ref.message;
-    return _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
+    return (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2() {
       var logger, filter, sendToClient, unsubscribe;
-      return regeneratorRuntime.wrap(function _callee2$(_context2) {
+      return _regenerator2.default.wrap(function _callee2$(_context2) {
         while (1) {
           switch (_context2.prev = _context2.next) {
             case 0:
@@ -55,8 +67,8 @@ var postEvents = {
                 }
 
                 if (!event.metadata.isAuthorized || event.metadata.isAuthorized.forPublic || event.metadata.isAuthorized.forAuthenticated && message.token.sub !== 'anonymous' || event.metadata.isAuthorized.owner === message.token.sub) {
-                  _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
-                    return regeneratorRuntime.wrap(function _callee$(_context) {
+                  (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
+                    return _regenerator2.default.wrap(function _callee$(_context) {
                       while (1) {
                         switch (_context.prev = _context.next) {
                           case 0:
@@ -119,9 +131,9 @@ var postEvents = {
 
     var app = _ref3.app,
         message = _ref3.message;
-    return _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3() {
+    return (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee3() {
       var logger, unsubscribe;
-      return regeneratorRuntime.wrap(function _callee3$(_context3) {
+      return _regenerator2.default.wrap(function _callee3$(_context3) {
         while (1) {
           switch (_context3.prev = _context3.next) {
             case 0:
@@ -194,7 +206,7 @@ var postEvents = {
       return;
     }
 
-    Object.keys(subscriptions[socket.uniqueId]).forEach(function (procedureId) {
+    (0, _keys2.default)(subscriptions[socket.uniqueId]).forEach(function (procedureId) {
       var unsubscribe = subscriptions[socket.uniqueId][procedureId];
 
       unsubscribe();

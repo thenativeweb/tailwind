@@ -1,10 +1,26 @@
 'use strict';
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+var _regenerator = require('babel-runtime/regenerator');
 
-function _asyncToGenerator(fn) { return function () { var gen = fn.apply(this, arguments); return new Promise(function (resolve, reject) { function step(key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { return Promise.resolve(value).then(function (value) { step("next", value); }, function (err) { step("throw", err); }); } } return step("next"); }); }; }
+var _regenerator2 = _interopRequireDefault(_regenerator);
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+var _promise = require('babel-runtime/core-js/promise');
+
+var _promise2 = _interopRequireDefault(_promise);
+
+var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
+
+var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
+
+var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
+
+var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
+
+var _createClass2 = require('babel-runtime/helpers/createClass');
+
+var _createClass3 = _interopRequireDefault(_createClass2);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var fs = require('fs'),
     path = require('path');
@@ -29,8 +45,7 @@ var Server = function () {
         corsOrigin = _ref.corsOrigin,
         readModel = _ref.readModel,
         writeModel = _ref.writeModel;
-
-    _classCallCheck(this, Server);
+    (0, _classCallCheck3.default)(this, Server);
 
     if (!port) {
       throw new Error('Port is missing.');
@@ -62,12 +77,12 @@ var Server = function () {
     this.writeModel = writeModel;
   }
 
-  _createClass(Server, [{
+  (0, _createClass3.default)(Server, [{
     key: 'link',
     value: function () {
-      var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(app, incoming, outgoing) {
+      var _ref2 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(app, incoming, outgoing) {
         var readModel, writeModel, privateKey, certificate, port, logger, api, server;
-        return regeneratorRuntime.wrap(function _callee$(_context) {
+        return _regenerator2.default.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
@@ -129,7 +144,7 @@ var Server = function () {
                 wsServer({ httpServer: server, app: app, readModel: readModel, writeModel: writeModel });
 
                 _context.next = 21;
-                return new Promise(function (resolve) {
+                return new _promise2.default(function (resolve) {
                   server.listen(port, function () {
                     logger.debug('Started API endpoint.', { port: port });
                     resolve();
@@ -151,7 +166,6 @@ var Server = function () {
       return link;
     }()
   }]);
-
   return Server;
 }();
 
