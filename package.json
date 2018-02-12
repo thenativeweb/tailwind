@@ -10,6 +10,10 @@
     {
       "name": "Matthias Wagler",
       "email": "matthias.wagler@thenativeweb.io"
+    },
+    {
+      "name": "Jan-Hendrik Grundhöfer",
+      "email": "jan-hendrik.grundhoefer@thenativeweb.io"
     }
   ],
   "main": "dist/tailwind.js",
@@ -20,8 +24,8 @@
     "commands-events": "1.0.1",
     "cors": "2.8.4",
     "crypto2": "1.0.1",
-    "datasette": "1.0.0",
-    "draht": "1.0.0",
+    "datasette": "1.0.1",
+    "draht": "1.0.1",
     "express": "4.16.2",
     "flaschenpost": "1.0.0",
     "hase": "1.0.0",
