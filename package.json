@@ -1,6 +1,6 @@
 {
   "name": "tailwind",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "tailwind is a base module for streaming and evented CQS applications.",
   "contributors": [
     {
