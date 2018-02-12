@@ -23,7 +23,7 @@
     "body-parser": "1.18.2",
     "commands-events": "1.0.1",
     "cors": "2.8.4",
-    "crypto2": "1.0.1",
+    "crypto2": "1.0.2",
     "datasette": "1.0.1",
     "draht": "1.0.1",
     "express": "4.16.2",
@@ -51,8 +51,8 @@
     "json-lines-client": "1.0.0",
     "needle": "2.1.1",
     "nodeenv": "1.0.0",
-    "roboter": "0.15.6",
-    "roboter-server": "0.15.6",
+    "roboter": "0.16.0",
+    "roboter-server": "0.16.0",
     "shelljs": "0.8.1"
   },
   "repository": {
