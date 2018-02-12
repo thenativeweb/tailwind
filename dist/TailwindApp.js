@@ -42,8 +42,11 @@ var TailwindApp = function () {
       }
     }
 
-    process.on('uncaughtException', function (err) {
-      _this.fail('Application failed unexpectedly.', err);
+    process.on('uncaughtException', function (ex) {
+      _this.fail('Application failed unexpectedly.', ex);
+    });
+    process.on('unhandledRejection', function (ex) {
+      _this.fail('Application failed unexpectedly.', ex);
     });
 
     this.dirname = appRoot.path;
