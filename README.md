@@ -149,9 +149,9 @@ await app.commandbus.use(new app.wires.commandbus.amqp.Sender({
 }));
 ```
 
-#### Configuring the STATUS server
+#### Configuring the status server
 
-If you want to create an STATUS I/O port which is based on `http` you have to use code similar to the following:
+If you want to create an status I/O port which is based on `http` you have to use code similar to the following:
 
 ```javascript
 await app.status.use(new app.wires.status.http.Server({
@@ -162,8 +162,8 @@ await app.status.use(new app.wires.status.http.Server({
 
 The parameters have the following meaning:
 
-- The `port` value defines the endpoint of the API.
-- The `corsOrigin` value can be a string or an array of strings and / or regular expressions containing the domains you want to allow to access your API. If you want your API to be accessible from everywhere, set this value to `*`.
+- The `port` value defines the endpoint of the status API.
+- The `corsOrigin` value can be a string or an array of strings and / or regular expressions containing the domains you want to allow to access your status API. If you want your API to be accessible from everywhere, set this value to `*`.
 
 ### Handling messages
 

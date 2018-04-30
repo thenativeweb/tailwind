@@ -5,9 +5,9 @@ const path = require('path');
 const assert = require('assertthat'),
       shell = require('shelljs');
 
-const env = require('../../../shared/helpers/env'),
+const env = require('../../../shared/env'),
       tailwind = require('../../../../src/tailwind'),
-      waitForRabbitMq = require('../../../shared/helpers/waitForRabbitMq');
+      waitForRabbitMq = require('../../../shared/waitForRabbitMq');
 
 suite('eventbus', () => {
   suite('amqp', function () {

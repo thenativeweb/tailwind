@@ -2,8 +2,7 @@
 
 const http = require('http');
 
-const bodyParser = require('body-parser'),
-      cors = require('cors'),
+const cors = require('cors'),
       express = require('express'),
       flaschenpost = require('flaschenpost'),
       flatten = require('lodash/flatten'),
@@ -67,7 +66,6 @@ class Server {
     }));
 
     api.use(nocache());
-    api.use(bodyParser.json({ limit: '100kb' }));
 
     api.use('/v1', v1());
 
@@ -75,7 +73,7 @@ class Server {
 
     await new Promise(resolve => {
       server.listen(port, () => {
-        logger.debug('Started STATUS endpoint.', { port });
+        logger.debug('Started status endpoint.', { port });
         resolve();
       });
     });
