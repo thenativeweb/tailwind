@@ -16,11 +16,11 @@ var postCommand = require('./wsPostCommand'),
     sendMessage = require('./wsSendMessage');
 
 var handleMessage = function () {
-  var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(socket, _ref2) {
-    var app = _ref2.app,
-        message = _ref2.message,
-        readModel = _ref2.readModel,
-        writeModel = _ref2.writeModel;
+  var _ref2 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(socket, _ref) {
+    var app = _ref.app,
+        message = _ref.message,
+        readModel = _ref.readModel,
+        writeModel = _ref.writeModel;
     var logger;
     return _regenerator2.default.wrap(function _callee$(_context) {
       while (1) {
@@ -130,7 +130,7 @@ var handleMessage = function () {
   }));
 
   return function handleMessage(_x, _x2) {
-    return _ref.apply(this, arguments);
+    return _ref2.apply(this, arguments);
   };
 }();
 

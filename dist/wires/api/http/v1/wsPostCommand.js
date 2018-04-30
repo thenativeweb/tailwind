@@ -16,13 +16,11 @@ var sendMessage = require('./wsSendMessage'),
     validateCommand = require('./validateCommand');
 
 var postCommand = {
-  send: function send(socket, _ref) {
-    var _this = this;
-
-    var app = _ref.app,
-        message = _ref.message,
-        writeModel = _ref.writeModel;
-    return (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
+  send: function () {
+    var _ref2 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(socket, _ref) {
+      var app = _ref.app,
+          message = _ref.message,
+          writeModel = _ref.writeModel;
       var logger, command, token;
       return _regenerator2.default.wrap(function _callee$(_context) {
         while (1) {
@@ -115,9 +113,15 @@ var postCommand = {
               return _context.stop();
           }
         }
-      }, _callee, _this, [[11, 15], [17, 22], [29, 34]]);
-    }))();
-  }
+      }, _callee, this, [[11, 15], [17, 22], [29, 34]]);
+    }));
+
+    function send(_x, _x2) {
+      return _ref2.apply(this, arguments);
+    }
+
+    return send;
+  }()
 };
 
 module.exports = postCommand;

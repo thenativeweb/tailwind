@@ -21,12 +21,12 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 var WebSocket = require('ws');
 
 var sendMessage = function () {
-  var _ref = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(socket, _ref2) {
-    var type = _ref2.type,
-        procedureId = _ref2.procedureId,
-        payload = _ref2.payload,
-        _ref2$statusCode = _ref2.statusCode,
-        statusCode = _ref2$statusCode === undefined ? 200 : _ref2$statusCode;
+  var _ref2 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(socket, _ref) {
+    var type = _ref.type,
+        procedureId = _ref.procedureId,
+        payload = _ref.payload,
+        _ref$statusCode = _ref.statusCode,
+        statusCode = _ref$statusCode === undefined ? 200 : _ref$statusCode;
     var message;
     return _regenerator2.default.wrap(function _callee$(_context) {
       while (1) {
@@ -83,7 +83,7 @@ var sendMessage = function () {
   }));
 
   return function sendMessage(_x, _x2) {
-    return _ref.apply(this, arguments);
+    return _ref2.apply(this, arguments);
   };
 }();
 

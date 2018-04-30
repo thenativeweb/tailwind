@@ -127,6 +127,7 @@ var TailwindApp = function () {
     this.commandbus = new IoPort(this);
     this.eventbus = new IoPort(this);
     this.flowbus = new IoPort(this);
+    this.status = new IoPort(this);
 
     this.api.outgoing.on('data', function () {
       // Register an empty event handler to avoid that outgoing data stacks up
@@ -162,6 +163,12 @@ var TailwindApp = function () {
     /* eslint-disable global-require*/
     this.wires.flowbus.amqp.Receiver = require('./wires/flowbus/amqp/Receiver');
     this.wires.flowbus.amqp.Sender = require('./wires/flowbus/amqp/Sender');
+    /* eslint-enable global-require*/
+
+    this.wires.status = {};
+    this.wires.status.http = {};
+    /* eslint-disable global-require*/
+    this.wires.status.http.Server = require('./wires/status/http/Server');
     /* eslint-enable global-require*/
   }
 

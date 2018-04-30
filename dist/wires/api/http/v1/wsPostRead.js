@@ -20,13 +20,12 @@ var sendMessage = require('./wsSendMessage'),
 var subscriptions = {};
 
 var postRead = {
-  subscribe: function subscribe(socket, _ref) {
-    var _this4 = this;
+  subscribe: function () {
+    var _ref2 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee4(socket, _ref) {
+      var app = _ref.app,
+          message = _ref.message,
+          readModel = _ref.readModel;
 
-    var app = _ref.app,
-        message = _ref.message,
-        readModel = _ref.readModel;
-    return (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee4() {
       var logger, _message$payload, modelName, modelType, _message$payload$quer, query, _query$orderBy, orderBy, _query$skip, skip, _query$take, take, _query$where, where, authenticationWhere, stream, onData, onEnd, onError, unsubscribe;
 
       return _regenerator2.default.wrap(function _callee4$(_context4) {
@@ -347,15 +346,19 @@ var postRead = {
               return _context4.stop();
           }
         }
-      }, _callee4, _this4, [[10, 15], [25, 30], [35, 40], [44, 48], [50, 55], [63, 69], [71, 76], [90, 95]]);
-    }))();
-  },
-  unsubscribe: function unsubscribe(socket, _ref5) {
-    var _this5 = this;
+      }, _callee4, this, [[10, 15], [25, 30], [35, 40], [44, 48], [50, 55], [63, 69], [71, 76], [90, 95]]);
+    }));
 
-    var app = _ref5.app,
-        message = _ref5.message;
-    return (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee5() {
+    function subscribe(_x, _x2) {
+      return _ref2.apply(this, arguments);
+    }
+
+    return subscribe;
+  }(),
+  unsubscribe: function () {
+    var _ref7 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee5(socket, _ref6) {
+      var app = _ref6.app,
+          message = _ref6.message;
       var logger, unsubscribe;
       return _regenerator2.default.wrap(function _callee5$(_context5) {
         while (1) {
@@ -418,9 +421,15 @@ var postRead = {
               return _context5.stop();
           }
         }
-      }, _callee5, _this5, [[11, 16]]);
-    }))();
-  },
+      }, _callee5, this, [[11, 16]]);
+    }));
+
+    function unsubscribe(_x3, _x4) {
+      return _ref7.apply(this, arguments);
+    }
+
+    return unsubscribe;
+  }(),
   removeAllListenersFor: function removeAllListenersFor(socket) {
     if (!socket) {
       throw new Error('Socket is missing.');

@@ -21,12 +21,10 @@ var sendMessage = require('./wsSendMessage');
 var subscriptions = {};
 
 var postEvents = {
-  subscribe: function subscribe(socket, _ref) {
-    var _this2 = this;
-
-    var app = _ref.app,
-        message = _ref.message;
-    return (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2() {
+  subscribe: function () {
+    var _ref2 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2(socket, _ref) {
+      var app = _ref.app,
+          message = _ref.message;
       var logger, filter, sendToClient, unsubscribe;
       return _regenerator2.default.wrap(function _callee2$(_context2) {
         while (1) {
@@ -123,15 +121,19 @@ var postEvents = {
               return _context2.stop();
           }
         }
-      }, _callee2, _this2, [[13, 18]]);
-    }))();
-  },
-  unsubscribe: function unsubscribe(socket, _ref3) {
-    var _this3 = this;
+      }, _callee2, this, [[13, 18]]);
+    }));
 
-    var app = _ref3.app,
-        message = _ref3.message;
-    return (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee3() {
+    function subscribe(_x, _x2) {
+      return _ref2.apply(this, arguments);
+    }
+
+    return subscribe;
+  }(),
+  unsubscribe: function () {
+    var _ref5 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee3(socket, _ref4) {
+      var app = _ref4.app,
+          message = _ref4.message;
       var logger, unsubscribe;
       return _regenerator2.default.wrap(function _callee3$(_context3) {
         while (1) {
@@ -194,9 +196,15 @@ var postEvents = {
               return _context3.stop();
           }
         }
-      }, _callee3, _this3, [[11, 16]]);
-    }))();
-  },
+      }, _callee3, this, [[11, 16]]);
+    }));
+
+    function unsubscribe(_x3, _x4) {
+      return _ref5.apply(this, arguments);
+    }
+
+    return unsubscribe;
+  }(),
   removeAllListenersFor: function removeAllListenersFor(socket) {
     if (!socket) {
       throw new Error('Socket is missing.');
