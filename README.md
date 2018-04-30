@@ -12,6 +12,7 @@ tailwind is a base module for streaming and evented CQS applications.
   * [Configuring I/O ports](#configuring-io-ports)
     + [Configuring the API server](#configuring-the-api-server)
     + [Configuring the command bus, the event bus, and the flow bus](#configuring-the-command-bus-the-event-bus-and-the-flow-bus)
+    + [Configuring the status server](#configuring-the-status-server)
   * [Handling messages](#handling-messages)
     + [Receiving incoming messages](#receiving-incoming-messages)
     + [Sending outgoing messages](#sending-outgoing-messages)
