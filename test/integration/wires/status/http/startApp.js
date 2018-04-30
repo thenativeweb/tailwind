@@ -12,21 +12,9 @@ const startApp = async function ({ port, corsOrigin }) {
     }
   });
 
-  await app.api.use(new app.wires.api.http.Server({
-    keys: path.join(__dirname, '..', '..', '..', '..', 'shared', 'keys'),
+  await app.api.use(new app.wires.status.http.Server({
     port,
-    corsOrigin,
-    writeModel: {
-      network: {
-        node: {
-          commands: { ping: {}},
-          events: { pinged: {}}
-        }
-      }
-    },
-    readModel: {
-      lists: { pings: {}}
-    }
+    corsOrigin
   }));
 
   return app;

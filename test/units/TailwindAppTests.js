@@ -432,6 +432,32 @@ suite('TailwindApp', () => {
     });
   });
 
+  suite('status', () => {
+    test('is an object.', async () => {
+      const app = new TailwindApp({
+        identityProvider: {
+          name: 'auth.wolkenkit.io',
+          certificate: path.join(__dirname, '..', 'shared', 'keys', 'certificate.pem')
+        }
+      });
+
+      assert.that(app.status).is.ofType('object');
+    });
+
+    test('is an I/O Port.', async () => {
+      const app = new TailwindApp({
+        identityProvider: {
+          name: 'auth.wolkenkit.io',
+          certificate: path.join(__dirname, '..', 'shared', 'keys', 'certificate.pem')
+        }
+      });
+
+      assert.that(app.status.incoming).is.not.undefined();
+      assert.that(app.status.outgoing).is.not.undefined();
+      assert.that(app.status.use).is.not.undefined();
+    });
+  });
+
   suite('fail', () => {
     test('is a function.', async () => {
       const app = new TailwindApp({
