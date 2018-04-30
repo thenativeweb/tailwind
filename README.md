@@ -109,8 +109,6 @@ If you want to create an API I/O port which is based on `http` you have to use c
 ```javascript
 await app.api.use(new app.wires.api.http.Server({
   keys: path.join(__dirname, 'keys'),
-  clientRegistry: 'wolkenkit',
-  host: 'sample.wolkenkit.io',
   port: 3000,
   corsOrigin: '*',
   writeModel: {
@@ -130,8 +128,7 @@ await app.api.use(new app.wires.api.http.Server({
 The parameters have the following meaning:
 
 - The `keys` value defines the directory from where the private key and certificate files are loaded. The files must be called `privateKey.pem` and `certificate.pem`.
-- The `clientRegistry` value contains the name of the JavaScript object that is used on the client-side to access to API.
-- The `host` and `port` values define the endpoint of the API.
+- The `port` value defines the endpoint of the API.
 - The `corsOrigin` value can be a string or an array of strings and / or regular expressions containing the domains you want to allow to access your API. If you want your API to be accessible from everywhere, set this value to `*`.
 - The `writeModel` and `readModel` values finally describe the contexts, topics, commands, events and models of your application.
 
@@ -151,6 +148,22 @@ await app.commandbus.use(new app.wires.commandbus.amqp.Sender({
   application: 'plcr'
 }));
 ```
+
+#### Configuring the status server
+
+If you want to create an status I/O port which is based on `http` you have to use code similar to the following:
+
+```javascript
+await app.status.use(new app.wires.status.http.Server({
+  port: 3000,
+  corsOrigin: '*'
+}));
+```
+
+The parameters have the following meaning:
+
+- The `port` value defines the endpoint of the status API.
+- The `corsOrigin` value can be a string or an array of strings and / or regular expressions containing the domains you want to allow to access your status API. If you want your API to be accessible from everywhere, set this value to `*`.
 
 ### Handling messages
 

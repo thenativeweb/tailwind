@@ -5,7 +5,7 @@ const path = require('path');
 const assert = require('assertthat'),
       nodeenv = require('nodeenv');
 
-const TailwindApp = require('../../lib/TailwindApp');
+const TailwindApp = require('../../src/TailwindApp');
 
 suite('TailwindApp', () => {
   test('is a function.', async () => {
@@ -17,7 +17,7 @@ suite('TailwindApp', () => {
       /* eslint-disable no-new */
       new TailwindApp({
         identityProvider: {
-          certificate: path.join(__dirname, '..', 'keys', 'certificate.pem')
+          certificate: path.join(__dirname, '..', 'shared', 'keys', 'certificate.pem')
         }
       });
       /* eslint-enable no-new */
@@ -41,7 +41,7 @@ suite('TailwindApp', () => {
       const app = new TailwindApp({
         identityProvider: {
           name: 'auth.wolkenkit.io',
-          certificate: path.join(__dirname, '..', 'keys', 'certificate.pem')
+          certificate: path.join(__dirname, '..', 'shared', 'keys', 'certificate.pem')
         }
       });
 
@@ -54,7 +54,7 @@ suite('TailwindApp', () => {
       const app = new TailwindApp({
         identityProvider: {
           name: 'auth.wolkenkit.io',
-          certificate: path.join(__dirname, '..', 'keys', 'certificate.pem')
+          certificate: path.join(__dirname, '..', 'shared', 'keys', 'certificate.pem')
         }
       });
 
@@ -65,7 +65,7 @@ suite('TailwindApp', () => {
       const app = new TailwindApp({
         identityProvider: {
           name: 'auth.wolkenkit.io',
-          certificate: path.join(__dirname, '..', 'keys', 'certificate.pem')
+          certificate: path.join(__dirname, '..', 'shared', 'keys', 'certificate.pem')
         }
       });
 
@@ -78,7 +78,7 @@ suite('TailwindApp', () => {
       const app = new TailwindApp({
         identityProvider: {
           name: 'auth.wolkenkit.io',
-          certificate: path.join(__dirname, '..', 'keys', 'certificate.pem')
+          certificate: path.join(__dirname, '..', 'shared', 'keys', 'certificate.pem')
         }
       });
 
@@ -92,7 +92,7 @@ suite('TailwindApp', () => {
       const app = new TailwindApp({
         identityProvider: {
           name: 'auth.wolkenkit.io',
-          certificate: path.join(__dirname, '..', 'keys', 'certificate.pem')
+          certificate: path.join(__dirname, '..', 'shared', 'keys', 'certificate.pem')
         }
       });
 
@@ -106,7 +106,7 @@ suite('TailwindApp', () => {
       const app = new TailwindApp({
         identityProvider: {
           name: 'auth.wolkenkit.io',
-          certificate: path.join(__dirname, '..', 'keys', 'certificate.pem')
+          certificate: path.join(__dirname, '..', 'shared', 'keys', 'certificate.pem')
         }
       });
 
@@ -120,7 +120,7 @@ suite('TailwindApp', () => {
       const app = new TailwindApp({
         identityProvider: {
           name: 'auth.wolkenkit.io',
-          certificate: path.join(__dirname, '..', 'keys', 'certificate.pem')
+          certificate: path.join(__dirname, '..', 'shared', 'keys', 'certificate.pem')
         }
       });
 
@@ -136,7 +136,7 @@ suite('TailwindApp', () => {
       const app = new TailwindApp({
         identityProvider: {
           name: 'auth.wolkenkit.io',
-          certificate: path.join(__dirname, '..', 'keys', 'certificate.pem')
+          certificate: path.join(__dirname, '..', 'shared', 'keys', 'certificate.pem')
         }
       });
 
@@ -150,7 +150,7 @@ suite('TailwindApp', () => {
       const app = new TailwindApp({
         identityProvider: {
           name: 'auth.wolkenkit.io',
-          certificate: path.join(__dirname, '..', 'keys', 'certificate.pem')
+          certificate: path.join(__dirname, '..', 'shared', 'keys', 'certificate.pem')
         }
       });
 
@@ -161,7 +161,7 @@ suite('TailwindApp', () => {
       const app = new TailwindApp({
         identityProvider: {
           name: 'auth.wolkenkit.io',
-          certificate: path.join(__dirname, '..', 'keys', 'certificate.pem')
+          certificate: path.join(__dirname, '..', 'shared', 'keys', 'certificate.pem')
         }
       });
 
@@ -177,7 +177,7 @@ suite('TailwindApp', () => {
       const app = new TailwindApp({
         identityProvider: {
           name: 'auth.wolkenkit.io',
-          certificate: path.join(__dirname, '..', 'keys', 'certificate.pem')
+          certificate: path.join(__dirname, '..', 'shared', 'keys', 'certificate.pem')
         }
       });
 
@@ -188,7 +188,7 @@ suite('TailwindApp', () => {
       const app = new TailwindApp({
         identityProvider: {
           name: 'auth.wolkenkit.io',
-          certificate: path.join(__dirname, '..', 'keys', 'certificate.pem')
+          certificate: path.join(__dirname, '..', 'shared', 'keys', 'certificate.pem')
         }
       });
 
@@ -201,7 +201,7 @@ suite('TailwindApp', () => {
       const app = new TailwindApp({
         identityProvider: {
           name: 'auth.wolkenkit.io',
-          certificate: path.join(__dirname, '..', 'keys', 'certificate.pem')
+          certificate: path.join(__dirname, '..', 'shared', 'keys', 'certificate.pem')
         }
       });
 
@@ -212,7 +212,7 @@ suite('TailwindApp', () => {
       const app = new TailwindApp({
         identityProvider: {
           name: 'auth.wolkenkit.io',
-          certificate: path.join(__dirname, '..', 'keys', 'certificate.pem')
+          certificate: path.join(__dirname, '..', 'shared', 'keys', 'certificate.pem')
         }
       });
 
@@ -225,7 +225,7 @@ suite('TailwindApp', () => {
       const app = new TailwindApp({
         identityProvider: {
           name: 'auth.wolkenkit.io',
-          certificate: path.join(__dirname, '..', 'keys', 'certificate.pem')
+          certificate: path.join(__dirname, '..', 'shared', 'keys', 'certificate.pem')
         }
       });
 
@@ -240,7 +240,7 @@ suite('TailwindApp', () => {
       const app = new TailwindApp({
         identityProvider: {
           name: 'auth.wolkenkit.io',
-          certificate: path.join(__dirname, '..', 'keys', 'certificate.pem')
+          certificate: path.join(__dirname, '..', 'shared', 'keys', 'certificate.pem')
         }
       });
 
@@ -251,7 +251,7 @@ suite('TailwindApp', () => {
       const app = new TailwindApp({
         identityProvider: {
           name: 'auth.wolkenkit.io',
-          certificate: path.join(__dirname, '..', 'keys', 'certificate.pem')
+          certificate: path.join(__dirname, '..', 'shared', 'keys', 'certificate.pem')
         }
       });
 
@@ -269,7 +269,7 @@ suite('TailwindApp', () => {
       const app = new TailwindApp({
         identityProvider: {
           name: 'auth.wolkenkit.io',
-          certificate: path.join(__dirname, '..', 'keys', 'certificate.pem')
+          certificate: path.join(__dirname, '..', 'shared', 'keys', 'certificate.pem')
         }
       });
 
@@ -280,7 +280,7 @@ suite('TailwindApp', () => {
       const app = new TailwindApp({
         identityProvider: {
           name: 'auth.wolkenkit.io',
-          certificate: path.join(__dirname, '..', 'keys', 'certificate.pem')
+          certificate: path.join(__dirname, '..', 'shared', 'keys', 'certificate.pem')
         }
       });
 
@@ -294,7 +294,7 @@ suite('TailwindApp', () => {
         new TailwindApp({
           identityProvider: {
             name: 'auth.wolkenkit.io',
-            certificate: path.join(__dirname, '..', 'keys', 'non-existent-certificate.pem')
+            certificate: path.join(__dirname, '..', 'shared', 'keys', 'non-existent-certificate.pem')
           }
         });
         /* eslint-enable no-new */
@@ -307,7 +307,7 @@ suite('TailwindApp', () => {
       const app = new TailwindApp({
         identityProvider: {
           name: 'auth.wolkenkit.io',
-          certificate: path.join(__dirname, '..', 'keys', 'certificate.pem')
+          certificate: path.join(__dirname, '..', 'shared', 'keys', 'certificate.pem')
         }
       });
 
@@ -320,7 +320,7 @@ suite('TailwindApp', () => {
       const app = new TailwindApp({
         identityProvider: {
           name: 'auth.wolkenkit.io',
-          certificate: path.join(__dirname, '..', 'keys', 'certificate.pem')
+          certificate: path.join(__dirname, '..', 'shared', 'keys', 'certificate.pem')
         }
       });
 
@@ -333,7 +333,7 @@ suite('TailwindApp', () => {
       const app = new TailwindApp({
         identityProvider: {
           name: 'auth.wolkenkit.io',
-          certificate: path.join(__dirname, '..', 'keys', 'certificate.pem')
+          certificate: path.join(__dirname, '..', 'shared', 'keys', 'certificate.pem')
         }
       });
 
@@ -344,7 +344,7 @@ suite('TailwindApp', () => {
       const app = new TailwindApp({
         identityProvider: {
           name: 'auth.wolkenkit.io',
-          certificate: path.join(__dirname, '..', 'keys', 'certificate.pem')
+          certificate: path.join(__dirname, '..', 'shared', 'keys', 'certificate.pem')
         }
       });
 
@@ -359,7 +359,7 @@ suite('TailwindApp', () => {
       const app = new TailwindApp({
         identityProvider: {
           name: 'auth.wolkenkit.io',
-          certificate: path.join(__dirname, '..', 'keys', 'certificate.pem')
+          certificate: path.join(__dirname, '..', 'shared', 'keys', 'certificate.pem')
         }
       });
 
@@ -370,7 +370,7 @@ suite('TailwindApp', () => {
       const app = new TailwindApp({
         identityProvider: {
           name: 'auth.wolkenkit.io',
-          certificate: path.join(__dirname, '..', 'keys', 'certificate.pem')
+          certificate: path.join(__dirname, '..', 'shared', 'keys', 'certificate.pem')
         }
       });
 
@@ -385,7 +385,7 @@ suite('TailwindApp', () => {
       const app = new TailwindApp({
         identityProvider: {
           name: 'auth.wolkenkit.io',
-          certificate: path.join(__dirname, '..', 'keys', 'certificate.pem')
+          certificate: path.join(__dirname, '..', 'shared', 'keys', 'certificate.pem')
         }
       });
 
@@ -396,7 +396,7 @@ suite('TailwindApp', () => {
       const app = new TailwindApp({
         identityProvider: {
           name: 'auth.wolkenkit.io',
-          certificate: path.join(__dirname, '..', 'keys', 'certificate.pem')
+          certificate: path.join(__dirname, '..', 'shared', 'keys', 'certificate.pem')
         }
       });
 
@@ -411,7 +411,7 @@ suite('TailwindApp', () => {
       const app = new TailwindApp({
         identityProvider: {
           name: 'auth.wolkenkit.io',
-          certificate: path.join(__dirname, '..', 'keys', 'certificate.pem')
+          certificate: path.join(__dirname, '..', 'shared', 'keys', 'certificate.pem')
         }
       });
 
@@ -422,7 +422,7 @@ suite('TailwindApp', () => {
       const app = new TailwindApp({
         identityProvider: {
           name: 'auth.wolkenkit.io',
-          certificate: path.join(__dirname, '..', 'keys', 'certificate.pem')
+          certificate: path.join(__dirname, '..', 'shared', 'keys', 'certificate.pem')
         }
       });
 
@@ -432,12 +432,38 @@ suite('TailwindApp', () => {
     });
   });
 
+  suite('status', () => {
+    test('is an object.', async () => {
+      const app = new TailwindApp({
+        identityProvider: {
+          name: 'auth.wolkenkit.io',
+          certificate: path.join(__dirname, '..', 'shared', 'keys', 'certificate.pem')
+        }
+      });
+
+      assert.that(app.status).is.ofType('object');
+    });
+
+    test('is an I/O Port.', async () => {
+      const app = new TailwindApp({
+        identityProvider: {
+          name: 'auth.wolkenkit.io',
+          certificate: path.join(__dirname, '..', 'shared', 'keys', 'certificate.pem')
+        }
+      });
+
+      assert.that(app.status.incoming).is.not.undefined();
+      assert.that(app.status.outgoing).is.not.undefined();
+      assert.that(app.status.use).is.not.undefined();
+    });
+  });
+
   suite('fail', () => {
     test('is a function.', async () => {
       const app = new TailwindApp({
         identityProvider: {
           name: 'auth.wolkenkit.io',
-          certificate: path.join(__dirname, '..', 'keys', 'certificate.pem')
+          certificate: path.join(__dirname, '..', 'shared', 'keys', 'certificate.pem')
         }
       });
 
@@ -450,7 +476,7 @@ suite('TailwindApp', () => {
       const app = new TailwindApp({
         identityProvider: {
           name: 'auth.wolkenkit.io',
-          certificate: path.join(__dirname, '..', 'keys', 'certificate.pem')
+          certificate: path.join(__dirname, '..', 'shared', 'keys', 'certificate.pem')
         }
       });
 

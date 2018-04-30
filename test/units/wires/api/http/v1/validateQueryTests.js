@@ -2,7 +2,7 @@
 
 const assert = require('assertthat');
 
-const validateQuery = require('../../../../../../lib/wires/api/http/v1/validateQuery');
+const validateQuery = require('../../../../../../src/wires/api/http/v1/validateQuery');
 
 suite('validateQuery', () => {
   test('is a function.', async () => {
