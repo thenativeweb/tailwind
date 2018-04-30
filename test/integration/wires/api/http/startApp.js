@@ -2,18 +2,18 @@
 
 const path = require('path');
 
-const tailwind = require('../../../../../lib/tailwind');
+const tailwind = require('../../../../../src/tailwind');
 
 const startApp = async function ({ port, corsOrigin }) {
   const app = tailwind.createApp({
     identityProvider: {
       name: 'auth.wolkenkit.io',
-      certificate: path.join(__dirname, '..', '..', '..', '..', 'keys', 'certificate.pem')
+      certificate: path.join(__dirname, '..', '..', '..', '..', 'shared', 'keys', 'certificate.pem')
     }
   });
 
   await app.api.use(new app.wires.api.http.Server({
-    keys: path.join(__dirname, '..', '..', '..', '..', 'keys'),
+    keys: path.join(__dirname, '..', '..', '..', '..', 'shared', 'keys'),
     clientRegistry: 'wolkenkit',
     host: 'sample.wolkenkit.io',
     port,

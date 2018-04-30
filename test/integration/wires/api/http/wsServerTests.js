@@ -6,8 +6,8 @@ const assert = require('assertthat'),
       uuid = require('uuidv4'),
       WebSocket = require('ws');
 
-const buildEvent = require('../../../../helpers/buildEvent'),
-      issueToken = require('../../../../helpers/issueToken'),
+const buildEvent = require('../../../../shared/helpers/buildEvent'),
+      issueToken = require('../../../../shared/helpers/issueToken'),
       startApp = require('./startApp');
 
 suite('wsServer', () => {

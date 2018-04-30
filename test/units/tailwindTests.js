@@ -4,7 +4,7 @@ const path = require('path');
 
 const assert = require('assertthat');
 
-const tailwind = require('../../lib/tailwind');
+const tailwind = require('../../src/tailwind');
 
 suite('tailwind', () => {
   suiteSetup(() => {
@@ -28,10 +28,10 @@ suite('tailwind', () => {
 
     test('returns the application once it has been defined.', async () => {
       tailwind.createApp({
-        keys: path.join(__dirname, '..', 'keys'),
+        keys: path.join(__dirname, '..', 'shared', 'keys'),
         identityProvider: {
           name: 'auth.wolkenkit.io',
-          certificate: path.join(__dirname, '..', 'keys', 'certificate.pem')
+          certificate: path.join(__dirname, '..', 'shared', 'keys', 'certificate.pem')
         }
       });
 
@@ -42,10 +42,10 @@ suite('tailwind', () => {
 
     test('returns the same application when called multiple times.', async () => {
       tailwind.createApp({
-        keys: path.join(__dirname, '..', 'keys'),
+        keys: path.join(__dirname, '..', 'shared', 'keys'),
         identityProvider: {
           name: 'auth.wolkenkit.io',
-          certificate: path.join(__dirname, '..', 'keys', 'certificate.pem')
+          certificate: path.join(__dirname, '..', 'shared', 'keys', 'certificate.pem')
         }
       });
 
@@ -57,20 +57,20 @@ suite('tailwind', () => {
 
     test('returns a new application when createApp was called in between.', async () => {
       tailwind.createApp({
-        keys: path.join(__dirname, '..', 'keys'),
+        keys: path.join(__dirname, '..', 'shared', 'keys'),
         identityProvider: {
           name: 'auth.wolkenkit.io',
-          certificate: path.join(__dirname, '..', 'keys', 'certificate.pem')
+          certificate: path.join(__dirname, '..', 'shared', 'keys', 'certificate.pem')
         }
       });
 
       const firstApp = tailwind.app();
 
       tailwind.createApp({
-        keys: path.join(__dirname, '..', 'keys'),
+        keys: path.join(__dirname, '..', 'shared', 'keys'),
         identityProvider: {
           name: 'auth.wolkenkit.io',
-          certificate: path.join(__dirname, '..', 'keys', 'certificate.pem')
+          certificate: path.join(__dirname, '..', 'shared', 'keys', 'certificate.pem')
         }
       });
 
@@ -87,10 +87,10 @@ suite('tailwind', () => {
 
     test('returns the application.', async () => {
       const app = tailwind.createApp({
-        keys: path.join(__dirname, '..', 'keys'),
+        keys: path.join(__dirname, '..', 'shared', 'keys'),
         identityProvider: {
           name: 'auth.wolkenkit.io',
-          certificate: path.join(__dirname, '..', 'keys', 'certificate.pem')
+          certificate: path.join(__dirname, '..', 'shared', 'keys', 'certificate.pem')
         }
       });
 
@@ -105,10 +105,10 @@ suite('tailwind', () => {
 
     test('destroy an existing application.', async () => {
       tailwind.createApp({
-        keys: path.join(__dirname, '..', 'keys'),
+        keys: path.join(__dirname, '..', 'shared', 'keys'),
         identityProvider: {
           name: 'auth.wolkenkit.io',
-          certificate: path.join(__dirname, '..', 'keys', 'certificate.pem')
+          certificate: path.join(__dirname, '..', 'shared', 'keys', 'certificate.pem')
         }
       });
       tailwind.destroyApp();

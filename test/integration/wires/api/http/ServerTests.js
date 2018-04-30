@@ -7,8 +7,8 @@ const assert = require('assertthat'),
       needle = require('needle'),
       uuid = require('uuidv4');
 
-const buildEvent = require('../../../../helpers/buildEvent'),
-      issueToken = require('../../../../helpers/issueToken'),
+const buildEvent = require('../../../../shared/helpers/buildEvent'),
+      issueToken = require('../../../../shared/helpers/issueToken'),
       startApp = require('./startApp');
 
 suite('Server', () => {

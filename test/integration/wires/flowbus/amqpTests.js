@@ -5,9 +5,9 @@ const path = require('path');
 const assert = require('assertthat'),
       shell = require('shelljs');
 
-const env = require('../../../helpers/env'),
-      tailwind = require('../../../../lib/tailwind'),
-      waitForRabbitMq = require('../../../helpers/waitForRabbitMq');
+const env = require('../../../shared/helpers/env'),
+      tailwind = require('../../../../src/tailwind'),
+      waitForRabbitMq = require('../../../shared/helpers/waitForRabbitMq');
 
 suite('flowbus', () => {
   suite('amqp', function () {
@@ -18,17 +18,17 @@ suite('flowbus', () => {
 
     setup(async () => {
       appSender = tailwind.createApp({
-        keys: path.join(__dirname, '..', '..', '..', 'keys'),
+        keys: path.join(__dirname, '..', '..', '..', 'shared', 'keys'),
         identityProvider: {
           name: 'auth.wolkenkit.io',
-          certificate: path.join(__dirname, '..', '..', '..', 'keys', 'certificate.pem')
+          certificate: path.join(__dirname, '..', '..', '..', 'shared', 'keys', 'certificate.pem')
         }
       });
       appReceiver = tailwind.createApp({
-        keys: path.join(__dirname, '..', '..', '..', 'keys'),
+        keys: path.join(__dirname, '..', '..', '..', 'shared', 'keys'),
         identityProvider: {
           name: 'auth.wolkenkit.io',
-          certificate: path.join(__dirname, '..', '..', '..', 'keys', 'certificate.pem')
+          certificate: path.join(__dirname, '..', '..', '..', 'shared', 'keys', 'certificate.pem')
         }
       });
 

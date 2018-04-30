@@ -4,7 +4,7 @@ const path = require('path');
 
 const assert = require('assertthat');
 
-const Server = require('../../../../../lib/wires/api/http/Server');
+const Server = require('../../../../../src/wires/api/http/Server');
 
 suite('Server', () => {
   test('is a function.', async () => {
@@ -30,7 +30,7 @@ suite('Server', () => {
   test('throws an exception if CORS origin is missing.', async () => {
     assert.that(() => {
       /* eslint-disable no-new */
-      new Server({ port: 3000, keys: path.join(__dirname, '..', '..', '..', '..', 'keys') });
+      new Server({ port: 3000, keys: path.join(__dirname, '..', '..', '..', '..', 'shared', 'keys') });
       /* eslint-enable no-new */
     }).is.throwing('CORS origin is missing.');
   });
