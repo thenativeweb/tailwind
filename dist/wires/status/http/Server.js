@@ -102,12 +102,12 @@ var Server = function () {
                 api.use(lusca.xssProtection());
 
                 api.options('*', cors({
-                  methods: 'GET,POST',
+                  methods: ['GET', 'POST'],
                   origin: this.corsOrigin,
                   optionsSuccessStatus: 200
                 }));
                 api.use(cors({
-                  methods: 'GET,POST',
+                  methods: ['GET', 'POST'],
                   origin: this.corsOrigin,
                   optionsSuccessStatus: 200
                 }));
