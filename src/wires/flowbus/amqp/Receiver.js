@@ -1,6 +1,7 @@
 'use strict';
 
-const hase = require('hase');
+const hase = require('hase'),
+      retry = require('async-retry');
 
 class Receiver {
   constructor ({ url, application }) {
@@ -31,7 +32,11 @@ class Receiver {
     let mq;
 
     try {
-      mq = await hase.connect(this.url);
+      mq = await retry(async () => {
+        const connection = await hase.connect(this.url);
+
+        return connection;
+      });
     } catch (ex) {
       return incoming.emit('error', ex);
     }

@@ -19,7 +19,8 @@
   "main": "dist/tailwind.js",
   "dependencies": {
     "ajv": "6.5.1",
-    "app-root-path": "2.0.1",
+    "app-root-path": "2.1.0",
+    "async-retry": "1.2.1",
     "babel-runtime": "6.26.0",
     "body-parser": "1.18.3",
     "commands-events": "1.0.3",
@@ -38,17 +39,16 @@
     "morgan": "1.9.0",
     "nocache": "2.0.0",
     "partof": "1.0.0",
-    "processenv": "1.0.2",
+    "processenv": "1.1.0",
     "spdy": "3.4.7",
     "stethoskop": "1.0.0",
     "timer2": "1.0.0",
     "uuidv4": "1.0.1",
-    "ws": "5.2.0"
+    "ws": "5.2.1"
   },
   "devDependencies": {
     "amqplib": "0.5.2",
     "assertthat": "1.0.0",
-    "async-retry": "1.2.1",
     "common-tags": "1.8.0",
     "json-lines-client": "1.0.1",
     "needle": "2.2.1",
