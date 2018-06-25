@@ -18,7 +18,8 @@ var _createClass3 = _interopRequireDefault(_createClass2);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var hase = require('hase');
+var hase = require('hase'),
+    retry = require('async-retry');
 
 var Sender = function () {
   function Sender(_ref) {
@@ -40,14 +41,16 @@ var Sender = function () {
   (0, _createClass3.default)(Sender, [{
     key: 'link',
     value: function () {
-      var _ref2 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(app, incoming, outgoing) {
+      var _ref2 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2(app, incoming, outgoing) {
+        var _this = this;
+
         var logger, mq, writeStream;
-        return _regenerator2.default.wrap(function _callee$(_context) {
+        return _regenerator2.default.wrap(function _callee2$(_context2) {
           while (1) {
-            switch (_context.prev = _context.next) {
+            switch (_context2.prev = _context2.next) {
               case 0:
                 if (app) {
-                  _context.next = 2;
+                  _context2.next = 2;
                   break;
                 }
 
@@ -55,7 +58,7 @@ var Sender = function () {
 
               case 2:
                 if (incoming) {
-                  _context.next = 4;
+                  _context2.next = 4;
                   break;
                 }
 
@@ -63,7 +66,7 @@ var Sender = function () {
 
               case 4:
                 if (outgoing) {
-                  _context.next = 6;
+                  _context2.next = 6;
                   break;
                 }
 
@@ -72,19 +75,38 @@ var Sender = function () {
               case 6:
                 logger = app.services.getLogger();
                 mq = void 0;
-                _context.prev = 8;
-                _context.next = 11;
-                return hase.connect(this.url);
+                _context2.prev = 8;
+                _context2.next = 11;
+                return retry((0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
+                  var connection;
+                  return _regenerator2.default.wrap(function _callee$(_context) {
+                    while (1) {
+                      switch (_context.prev = _context.next) {
+                        case 0:
+                          _context.next = 2;
+                          return hase.connect(_this.url);
+
+                        case 2:
+                          connection = _context.sent;
+                          return _context.abrupt('return', connection);
+
+                        case 4:
+                        case 'end':
+                          return _context.stop();
+                      }
+                    }
+                  }, _callee, _this);
+                })));
 
               case 11:
-                mq = _context.sent;
-                _context.next = 17;
+                mq = _context2.sent;
+                _context2.next = 17;
                 break;
 
               case 14:
-                _context.prev = 14;
-                _context.t0 = _context['catch'](8);
-                return _context.abrupt('return', outgoing.emit('error', _context.t0));
+                _context2.prev = 14;
+                _context2.t0 = _context2['catch'](8);
+                return _context2.abrupt('return', outgoing.emit('error', _context2.t0));
 
               case 17:
 
@@ -97,19 +119,19 @@ var Sender = function () {
                 });
 
                 writeStream = void 0;
-                _context.prev = 20;
-                _context.next = 23;
+                _context2.prev = 20;
+                _context2.next = 23;
                 return mq.worker(this.application + '::flows').createWriteStream();
 
               case 23:
-                writeStream = _context.sent;
-                _context.next = 29;
+                writeStream = _context2.sent;
+                _context2.next = 29;
                 break;
 
               case 26:
-                _context.prev = 26;
-                _context.t1 = _context['catch'](20);
-                return _context.abrupt('return', incoming.emit('error', _context.t1));
+                _context2.prev = 26;
+                _context2.t1 = _context2['catch'](20);
+                return _context2.abrupt('return', incoming.emit('error', _context2.t1));
 
               case 29:
 
@@ -123,10 +145,10 @@ var Sender = function () {
 
               case 31:
               case 'end':
-                return _context.stop();
+                return _context2.stop();
             }
           }
-        }, _callee, this, [[8, 14], [20, 26]]);
+        }, _callee2, this, [[8, 14], [20, 26]]);
       }));
 
       function link(_x, _x2, _x3) {
