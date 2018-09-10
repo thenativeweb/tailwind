@@ -17,7 +17,7 @@ const v1 = require('./v1'),
       wsServer = require('./wsServer');
 
 class Server {
-  constructor ({ port, keys, corsOrigin, readModel, writeModel }) {
+  constructor ({ port, keys, corsOrigin, readModel, serveStatic, writeModel }) {
     if (!port) {
       throw new Error('Port is missing.');
     }
@@ -43,8 +43,25 @@ class Server {
       throw new Error('Keys could not be loaded.');
     }
 
+    if (serveStatic) {
+      let staticPath;
+
+      try {
+        /* eslint-disable no-sync */
+        staticPath = fs.lstatSync(serveStatic);
+        /* eslint-enble no-sync */
+      } catch (ex) {
+        throw new Error('Serve static is not a valid path.');
+      }
+
+      if (!staticPath.isDirectory()) {
+        throw new Error('Serve static is not a directory.');
+      }
+    }
+
     this.port = port;
     this.readModel = readModel;
+    this.serveStatic = serveStatic;
     this.writeModel = writeModel;
   }
 
@@ -59,7 +76,7 @@ class Server {
       throw new Error('Outgoing is missing.');
     }
 
-    const { readModel, writeModel, privateKey, certificate, port } = this;
+    const { readModel, writeModel, privateKey, certificate, port, serveStatic } = this;
 
     const logger = app.services.getLogger();
 
@@ -87,6 +104,10 @@ class Server {
     api.use(bodyParser.json({ limit: '100kb' }));
 
     api.use('/v1', v1(app, { readModel, writeModel }));
+
+    if (serveStatic) {
+      api.use(express.static(serveStatic));
+    }
 
     const server = spdy.createServer({ key: privateKey, cert: certificate }, api);
 

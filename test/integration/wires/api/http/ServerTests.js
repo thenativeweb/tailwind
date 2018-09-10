@@ -1,6 +1,7 @@
 'use strict';
 
-const { PassThrough } = require('stream');
+const { PassThrough } = require('stream'),
+      path = require('path');
 
 const assert = require('assertthat'),
       jsonLinesClient = require('json-lines-client'),
@@ -1349,6 +1350,20 @@ suite('Server', () => {
           }).write({ foo: 'bar' });
         });
       });
+    });
+  });
+
+  suite('serveStatic', () => {
+    test('serves static content from given directory.', async () => {
+      const staticDirectory = path.join(__dirname, 'serveStatic');
+
+      await startApp({ port: 2999, corsOrigin: '*', serveStatic: staticDirectory });
+
+      const res = await needle('get', 'https://localhost:2999/test.txt');
+
+      assert.that(res.statusCode).is.equalTo(200);
+      assert.that(res.body).is.ofType('string');
+      assert.that(res.body).is.equalTo('This is a static file.\n');
     });
   });
 });
