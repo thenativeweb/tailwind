@@ -44,6 +44,7 @@ var Server = function () {
         keys = _ref.keys,
         corsOrigin = _ref.corsOrigin,
         readModel = _ref.readModel,
+        serveStatic = _ref.serveStatic,
         writeModel = _ref.writeModel;
     (0, _classCallCheck3.default)(this, Server);
 
@@ -72,8 +73,25 @@ var Server = function () {
       throw new Error('Keys could not be loaded.');
     }
 
+    if (serveStatic) {
+      var staticPath = void 0;
+
+      try {
+        /* eslint-disable no-sync */
+        staticPath = fs.lstatSync(serveStatic);
+        /* eslint-enble no-sync */
+      } catch (ex) {
+        throw new Error('Serve static is not a valid path.');
+      }
+
+      if (!staticPath.isDirectory()) {
+        throw new Error('Serve static is not a directory.');
+      }
+    }
+
     this.port = port;
     this.readModel = readModel;
+    this.serveStatic = serveStatic;
     this.writeModel = writeModel;
   }
 
@@ -81,7 +99,7 @@ var Server = function () {
     key: 'link',
     value: function () {
       var _ref2 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(app, incoming, outgoing) {
-        var readModel, writeModel, privateKey, certificate, port, logger, api, server;
+        var readModel, writeModel, privateKey, certificate, port, serveStatic, logger, api, server;
         return _regenerator2.default.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
@@ -110,7 +128,7 @@ var Server = function () {
                 throw new Error('Outgoing is missing.');
 
               case 6:
-                readModel = this.readModel, writeModel = this.writeModel, privateKey = this.privateKey, certificate = this.certificate, port = this.port;
+                readModel = this.readModel, writeModel = this.writeModel, privateKey = this.privateKey, certificate = this.certificate, port = this.port, serveStatic = this.serveStatic;
                 logger = app.services.getLogger();
                 api = express();
 
@@ -138,12 +156,16 @@ var Server = function () {
 
                 api.use('/v1', v1(app, { readModel: readModel, writeModel: writeModel }));
 
+                if (serveStatic) {
+                  api.use('/', express.static(serveStatic));
+                }
+
                 server = spdy.createServer({ key: privateKey, cert: certificate }, api);
 
 
                 wsServer({ httpServer: server, app: app, readModel: readModel, writeModel: writeModel });
 
-                _context.next = 21;
+                _context.next = 22;
                 return new _promise2.default(function (resolve) {
                   server.listen(port, function () {
                     logger.debug('Started API endpoint.', { port: port });
@@ -151,7 +173,7 @@ var Server = function () {
                   });
                 });
 
-              case 21:
+              case 22:
               case 'end':
                 return _context.stop();
             }
