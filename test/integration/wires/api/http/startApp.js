@@ -4,7 +4,7 @@ const path = require('path');
 
 const tailwind = require('../../../../../src/tailwind');
 
-const startApp = async function ({ port, corsOrigin }) {
+const startApp = async function ({ port, corsOrigin, serveStatic }) {
   const app = tailwind.createApp({
     identityProvider: {
       name: 'auth.wolkenkit.io',
@@ -16,6 +16,7 @@ const startApp = async function ({ port, corsOrigin }) {
     keys: path.join(__dirname, '..', '..', '..', '..', 'shared', 'keys'),
     port,
     corsOrigin,
+    serveStatic,
     writeModel: {
       network: {
         node: {
