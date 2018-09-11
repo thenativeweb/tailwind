@@ -106,7 +106,7 @@ class Server {
     api.use('/v1', v1(app, { readModel, writeModel }));
 
     if (serveStatic) {
-      api.use(express.static(serveStatic));
+      api.use('/', express.static(serveStatic));
     }
 
     const server = spdy.createServer({ key: privateKey, cert: certificate }, api);
