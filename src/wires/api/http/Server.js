@@ -4,6 +4,7 @@ const fs = require('fs'),
       path = require('path');
 
 const bodyParser = require('body-parser'),
+      compression = require('compression'),
       cors = require('cors'),
       express = require('express'),
       flaschenpost = require('flaschenpost'),
@@ -106,6 +107,7 @@ class Server {
     api.use('/v1', v1(app, { readModel, writeModel }));
 
     if (serveStatic) {
+      api.use(compression());
       api.use('/', express.static(serveStatic));
     }
 

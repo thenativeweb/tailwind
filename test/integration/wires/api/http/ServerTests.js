@@ -1354,16 +1354,29 @@ suite('Server', () => {
   });
 
   suite('serveStatic', () => {
-    test('serves static content from given directory.', async () => {
+    suiteSetup(async () => {
       const staticDirectory = path.join(__dirname, 'serveStatic');
 
       await startApp({ port: 2999, corsOrigin: '*', serveStatic: staticDirectory });
+    });
 
+    test('serves static content from given directory.', async () => {
       const res = await needle('get', 'https://localhost:2999/test.txt');
 
       assert.that(res.statusCode).is.equalTo(200);
       assert.that(res.body).is.ofType('string');
       assert.that(res.body).is.equalTo('This is a static file.\n');
+    });
+
+    test('uses gzip compression.', async () => {
+      const res = await needle('get', 'https://localhost:2999/compression-test.html', {
+        headers: {
+          'Accept-Encoding': 'gzip, deflate'
+        }
+      });
+
+      assert.that(res.statusCode).is.equalTo(200);
+      assert.that(res.headers['content-encoding']).is.equalTo('gzip');
     });
   });
 });
