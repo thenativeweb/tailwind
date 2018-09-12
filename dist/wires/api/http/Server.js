@@ -26,6 +26,7 @@ var fs = require('fs'),
     path = require('path');
 
 var bodyParser = require('body-parser'),
+    compression = require('compression'),
     cors = require('cors'),
     express = require('express'),
     flaschenpost = require('flaschenpost'),
@@ -157,6 +158,7 @@ var Server = function () {
                 api.use('/v1', v1(app, { readModel: readModel, writeModel: writeModel }));
 
                 if (serveStatic) {
+                  api.use(compression());
                   api.use('/', express.static(serveStatic));
                 }
 
