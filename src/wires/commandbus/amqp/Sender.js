@@ -33,7 +33,9 @@ class Sender {
 
     try {
       mq = await retry(async () => {
-        const connection = await hase.connect(this.url);
+        const { url } = this;
+
+        const connection = await hase.connect({ url });
 
         return connection;
       });

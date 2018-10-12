@@ -148,6 +148,12 @@ await app.commandbus.use(new app.wires.commandbus.amqp.Sender({
   url: 'amqp://admin:admin@localhost:5672',
   application: 'plcr'
 }));
+
+await app.commandbus.use(new app.wires.commandbus.amqp.Receiver({
+  url: 'amqp://admin:admin@localhost:5672',
+  application: 'plcr',
+  prefetch: 50
+}));
 ```
 
 #### Configuring the status server
