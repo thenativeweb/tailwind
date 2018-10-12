@@ -4,7 +4,7 @@ const hase = require('hase'),
       retry = require('async-retry');
 
 class Receiver {
-  constructor ({ url, application }) {
+  constructor ({ url, application, prefetch }) {
     if (!url) {
       throw new Error('Url is missing.');
     }
@@ -14,6 +14,7 @@ class Receiver {
 
     this.url = url;
     this.application = application;
+    this.prefetch = prefetch;
   }
 
   async link (app, incoming, outgoing) {
@@ -33,7 +34,9 @@ class Receiver {
 
     try {
       mq = await retry(async () => {
-        const connection = await hase.connect(this.url);
+        const { url, prefetch } = this;
+
+        const connection = await hase.connect({ url, prefetch });
 
         return connection;
       });
