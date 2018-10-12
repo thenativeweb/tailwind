@@ -6,9 +6,7 @@ var getStatus = require('./getStatus');
 
 var v1 = function v1() {
   var api = express();
-
   api.get('/status', getStatus());
-
   return api;
 };
 

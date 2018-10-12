@@ -1,132 +1,152 @@
 'use strict';
 
-var _regenerator = require('babel-runtime/regenerator');
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
-var _regenerator2 = _interopRequireDefault(_regenerator);
+var _regenerator = _interopRequireDefault(require("@babel/runtime/regenerator"));
 
-var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
-
-var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/asyncToGenerator"));
 
 var postCommand = require('./wsPostCommand'),
     postEvents = require('./wsPostEvents'),
     postRead = require('./wsPostRead'),
     sendMessage = require('./wsSendMessage');
 
-var handleMessage = function () {
-  var _ref2 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(socket, _ref) {
-    var app = _ref.app,
-        message = _ref.message,
-        readModel = _ref.readModel,
-        writeModel = _ref.writeModel;
-    var logger;
-    return _regenerator2.default.wrap(function _callee$(_context) {
+var handleMessage =
+/*#__PURE__*/
+function () {
+  var _ref2 = (0, _asyncToGenerator2.default)(
+  /*#__PURE__*/
+  _regenerator.default.mark(function _callee(socket, _ref) {
+    var app, message, readModel, writeModel, logger;
+    return _regenerator.default.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
+            app = _ref.app, message = _ref.message, readModel = _ref.readModel, writeModel = _ref.writeModel;
+
             if (socket) {
-              _context.next = 2;
+              _context.next = 3;
               break;
             }
 
             throw new Error('Socket is missing.');
 
-          case 2:
+          case 3:
             if (app) {
-              _context.next = 4;
+              _context.next = 5;
               break;
             }
 
             throw new Error('App is missing.');
 
-          case 4:
+          case 5:
             if (message) {
-              _context.next = 6;
+              _context.next = 7;
               break;
             }
 
             throw new Error('Message is missing.');
 
-          case 6:
+          case 7:
             if (readModel) {
-              _context.next = 8;
+              _context.next = 9;
               break;
             }
 
             throw new Error('Read model is missing.');
 
-          case 8:
+          case 9:
             if (writeModel) {
-              _context.next = 10;
+              _context.next = 11;
               break;
             }
 
             throw new Error('Write model is missing.');
 
-          case 10:
+          case 11:
             logger = app.services.getLogger();
             _context.t0 = message.type;
-            _context.next = _context.t0 === 'sendCommand' ? 14 : _context.t0 === 'subscribeEvents' ? 17 : _context.t0 === 'unsubscribeEvents' ? 20 : _context.t0 === 'subscribeRead' ? 23 : _context.t0 === 'unsubscribeRead' ? 26 : 29;
+            _context.next = _context.t0 === 'sendCommand' ? 15 : _context.t0 === 'subscribeEvents' ? 18 : _context.t0 === 'unsubscribeEvents' ? 21 : _context.t0 === 'subscribeRead' ? 24 : _context.t0 === 'unsubscribeRead' ? 27 : 30;
             break;
 
-          case 14:
-            _context.next = 16;
-            return postCommand.send(socket, { app: app, message: message, writeModel: writeModel });
-
-          case 16:
-            return _context.abrupt('break', 37);
+          case 15:
+            _context.next = 17;
+            return postCommand.send(socket, {
+              app: app,
+              message: message,
+              writeModel: writeModel
+            });
 
           case 17:
-            _context.next = 19;
-            return postEvents.subscribe(socket, { app: app, message: message });
+            return _context.abrupt("break", 38);
 
-          case 19:
-            return _context.abrupt('break', 37);
+          case 18:
+            _context.next = 20;
+            return postEvents.subscribe(socket, {
+              app: app,
+              message: message
+            });
 
           case 20:
-            _context.next = 22;
-            return postEvents.unsubscribe(socket, { app: app, message: message });
+            return _context.abrupt("break", 38);
 
-          case 22:
-            return _context.abrupt('break', 37);
+          case 21:
+            _context.next = 23;
+            return postEvents.unsubscribe(socket, {
+              app: app,
+              message: message
+            });
 
           case 23:
-            _context.next = 25;
-            return postRead.subscribe(socket, { app: app, message: message, readModel: readModel });
+            return _context.abrupt("break", 38);
 
-          case 25:
-            return _context.abrupt('break', 37);
+          case 24:
+            _context.next = 26;
+            return postRead.subscribe(socket, {
+              app: app,
+              message: message,
+              readModel: readModel
+            });
 
           case 26:
-            _context.next = 28;
-            return postRead.unsubscribe(socket, { app: app, message: message });
+            return _context.abrupt("break", 38);
 
-          case 28:
-            return _context.abrupt('break', 37);
+          case 27:
+            _context.next = 29;
+            return postRead.unsubscribe(socket, {
+              app: app,
+              message: message
+            });
 
           case 29:
-            _context.prev = 29;
-            _context.next = 32;
-            return sendMessage(socket, { type: 'error', statusCode: 400, payload: 'Bad request.' });
+            return _context.abrupt("break", 38);
 
-          case 32:
-            _context.next = 37;
+          case 30:
+            _context.prev = 30;
+            _context.next = 33;
+            return sendMessage(socket, {
+              type: 'error',
+              statusCode: 400,
+              payload: 'Bad request.'
+            });
+
+          case 33:
+            _context.next = 38;
             break;
 
-          case 34:
-            _context.prev = 34;
-            _context.t1 = _context['catch'](29);
+          case 35:
+            _context.prev = 35;
+            _context.t1 = _context["catch"](30);
+            logger.error('Failed to send message.', {
+              ex: _context.t1
+            });
 
-            logger.error('Failed to send message.', { ex: _context.t1 });
-
-          case 37:
-          case 'end':
+          case 38:
+          case "end":
             return _context.stop();
         }
       }
-    }, _callee, this, [[29, 34]]);
+    }, _callee, this, [[30, 35]]);
   }));
 
   return function handleMessage(_x, _x2) {

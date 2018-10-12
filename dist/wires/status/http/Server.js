@@ -1,26 +1,14 @@
 'use strict';
 
-var _regenerator = require('babel-runtime/regenerator');
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
-var _regenerator2 = _interopRequireDefault(_regenerator);
+var _regenerator = _interopRequireDefault(require("@babel/runtime/regenerator"));
 
-var _promise = require('babel-runtime/core-js/promise');
+var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/asyncToGenerator"));
 
-var _promise2 = _interopRequireDefault(_promise);
+var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/classCallCheck"));
 
-var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
-
-var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
-
-var _classCallCheck2 = require('babel-runtime/helpers/classCallCheck');
-
-var _classCallCheck3 = _interopRequireDefault(_classCallCheck2);
-
-var _createClass2 = require('babel-runtime/helpers/createClass');
-
-var _createClass3 = _interopRequireDefault(_createClass2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
 
 var http = require('http');
 
@@ -34,15 +22,18 @@ var cors = require('cors'),
 
 var v1 = require('./v1');
 
-var Server = function () {
+var Server =
+/*#__PURE__*/
+function () {
   function Server(_ref) {
     var port = _ref.port,
         corsOrigin = _ref.corsOrigin;
-    (0, _classCallCheck3.default)(this, Server);
+    (0, _classCallCheck2.default)(this, Server);
 
     if (!port) {
       throw new Error('Port is missing.');
     }
+
     if (!corsOrigin) {
       throw new Error('CORS origin is missing.');
     }
@@ -56,12 +47,14 @@ var Server = function () {
     this.port = port;
   }
 
-  (0, _createClass3.default)(Server, [{
-    key: 'link',
+  (0, _createClass2.default)(Server, [{
+    key: "link",
     value: function () {
-      var _ref2 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(app, incoming, outgoing) {
+      var _link = (0, _asyncToGenerator2.default)(
+      /*#__PURE__*/
+      _regenerator.default.mark(function _callee(app, incoming, outgoing) {
         var port, logger, api, server;
-        return _regenerator2.default.wrap(function _callee$(_context) {
+        return _regenerator.default.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
@@ -92,15 +85,11 @@ var Server = function () {
                 port = this.port;
                 logger = app.services.getLogger();
                 api = express();
-
-
                 api.use(morgan('tiny', {
                   stream: new flaschenpost.Middleware('debug')
                 }));
-
                 api.use(lusca.xframe('DENY'));
                 api.use(lusca.xssProtection());
-
                 api.options('*', cors({
                   methods: ['GET', 'POST'],
                   origin: this.corsOrigin,
@@ -111,33 +100,30 @@ var Server = function () {
                   origin: this.corsOrigin,
                   optionsSuccessStatus: 200
                 }));
-
                 api.use(nocache());
-
                 api.use('/v1', v1());
-
                 server = http.createServer(api);
                 _context.next = 19;
-                return new _promise2.default(function (resolve) {
+                return new Promise(function (resolve) {
                   server.listen(port, function () {
-                    logger.debug('Started status endpoint.', { port: port });
+                    logger.debug('Started status endpoint.', {
+                      port: port
+                    });
                     resolve();
                   });
                 });
 
               case 19:
-              case 'end':
+              case "end":
                 return _context.stop();
             }
           }
         }, _callee, this);
       }));
 
-      function link(_x, _x2, _x3) {
-        return _ref2.apply(this, arguments);
-      }
-
-      return link;
+      return function link(_x, _x2, _x3) {
+        return _link.apply(this, arguments);
+      };
     }()
   }]);
   return Server;

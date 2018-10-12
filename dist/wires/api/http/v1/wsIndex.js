@@ -5,4 +5,9 @@ var handleMessage = require('./wsHandleMessage'),
     postRead = require('./wsPostRead'),
     sendMessage = require('./wsSendMessage');
 
-module.exports = { handleMessage: handleMessage, postEvents: postEvents, postRead: postRead, sendMessage: sendMessage };
+module.exports = {
+  handleMessage: handleMessage,
+  postEvents: postEvents,
+  postRead: postRead,
+  sendMessage: sendMessage
+};

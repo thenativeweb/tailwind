@@ -1,78 +1,76 @@
 'use strict';
 
-var _keys = require('babel-runtime/core-js/object/keys');
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
-var _keys2 = _interopRequireDefault(_keys);
+var _regenerator = _interopRequireDefault(require("@babel/runtime/regenerator"));
 
-var _regenerator = require('babel-runtime/regenerator');
-
-var _regenerator2 = _interopRequireDefault(_regenerator);
-
-var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
-
-var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/asyncToGenerator"));
 
 var partOf = require('partof');
 
 var sendMessage = require('./wsSendMessage');
 
 var subscriptions = {};
-
 var postEvents = {
   subscribe: function () {
-    var _ref2 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee2(socket, _ref) {
-      var app = _ref.app,
-          message = _ref.message;
-      var logger, filter, sendToClient, unsubscribe;
-      return _regenerator2.default.wrap(function _callee2$(_context2) {
+    var _subscribe = (0, _asyncToGenerator2.default)(
+    /*#__PURE__*/
+    _regenerator.default.mark(function _callee2(socket, _ref) {
+      var app, message, logger, filter, sendToClient, unsubscribe;
+      return _regenerator.default.wrap(function _callee2$(_context2) {
         while (1) {
           switch (_context2.prev = _context2.next) {
             case 0:
+              app = _ref.app, message = _ref.message;
+
               if (socket) {
-                _context2.next = 2;
+                _context2.next = 3;
                 break;
               }
 
               throw new Error('Socket is missing.');
 
-            case 2:
+            case 3:
               if (app) {
-                _context2.next = 4;
+                _context2.next = 5;
                 break;
               }
 
               throw new Error('App is missing.');
 
-            case 4:
+            case 5:
               if (message) {
-                _context2.next = 6;
+                _context2.next = 7;
                 break;
               }
 
               throw new Error('Message is missing.');
 
-            case 6:
+            case 7:
               logger = app.services.getLogger();
               filter = message.payload ? message.payload.filter || {} : {};
 
               sendToClient = function sendToClient(event) {
-                var _this = this;
-
                 if (!partOf(filter, event)) {
                   return;
                 }
 
                 if (!event.metadata.isAuthorized || event.metadata.isAuthorized.forPublic || event.metadata.isAuthorized.forAuthenticated && message.token.sub !== 'anonymous' || event.metadata.isAuthorized.owner === message.token.sub) {
-                  (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee() {
-                    return _regenerator2.default.wrap(function _callee$(_context) {
+                  (0, _asyncToGenerator2.default)(
+                  /*#__PURE__*/
+                  _regenerator.default.mark(function _callee() {
+                    return _regenerator.default.wrap(function _callee$(_context) {
                       while (1) {
                         switch (_context.prev = _context.next) {
                           case 0:
                             _context.prev = 0;
                             _context.next = 3;
-                            return sendMessage(socket, { type: 'event', payload: event, statusCode: 200, procedureId: message.procedureId });
+                            return sendMessage(socket, {
+                              type: 'event',
+                              payload: event,
+                              statusCode: 200,
+                              procedureId: message.procedureId
+                            });
 
                           case 3:
                             _context.next = 8;
@@ -80,16 +78,17 @@ var postEvents = {
 
                           case 5:
                             _context.prev = 5;
-                            _context.t0 = _context['catch'](0);
-
-                            logger.error('Failed to send message.', { ex: _context.t0 });
+                            _context.t0 = _context["catch"](0);
+                            logger.error('Failed to send message.', {
+                              ex: _context.t0
+                            });
 
                           case 8:
-                          case 'end':
+                          case "end":
                             return _context.stop();
                         }
                       }
-                    }, _callee, _this, [[0, 5]]);
+                    }, _callee, this, [[0, 5]]);
                   }))();
                 }
               };
@@ -100,110 +99,115 @@ var postEvents = {
 
               subscriptions[socket.uniqueId] = subscriptions[socket.uniqueId] || {};
               subscriptions[socket.uniqueId][message.procedureId] = unsubscribe;
-
               app.api.outgoing.on('data', sendToClient);
-              _context2.prev = 13;
-              _context2.next = 16;
-              return sendMessage(socket, { type: 'subscribedEvents', statusCode: 200, procedureId: message.procedureId });
+              _context2.prev = 14;
+              _context2.next = 17;
+              return sendMessage(socket, {
+                type: 'subscribedEvents',
+                statusCode: 200,
+                procedureId: message.procedureId
+              });
 
-            case 16:
-              _context2.next = 21;
+            case 17:
+              _context2.next = 22;
               break;
 
-            case 18:
-              _context2.prev = 18;
-              _context2.t0 = _context2['catch'](13);
+            case 19:
+              _context2.prev = 19;
+              _context2.t0 = _context2["catch"](14);
+              logger.error('Failed to send message.', {
+                ex: _context2.t0
+              });
 
-              logger.error('Failed to send message.', { ex: _context2.t0 });
-
-            case 21:
-            case 'end':
+            case 22:
+            case "end":
               return _context2.stop();
           }
         }
-      }, _callee2, this, [[13, 18]]);
+      }, _callee2, this, [[14, 19]]);
     }));
 
-    function subscribe(_x, _x2) {
-      return _ref2.apply(this, arguments);
-    }
-
-    return subscribe;
+    return function subscribe(_x, _x2) {
+      return _subscribe.apply(this, arguments);
+    };
   }(),
   unsubscribe: function () {
-    var _ref5 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee3(socket, _ref4) {
-      var app = _ref4.app,
-          message = _ref4.message;
-      var logger, unsubscribe;
-      return _regenerator2.default.wrap(function _callee3$(_context3) {
+    var _unsubscribe = (0, _asyncToGenerator2.default)(
+    /*#__PURE__*/
+    _regenerator.default.mark(function _callee3(socket, _ref3) {
+      var app, message, logger, unsubscribe;
+      return _regenerator.default.wrap(function _callee3$(_context3) {
         while (1) {
           switch (_context3.prev = _context3.next) {
             case 0:
+              app = _ref3.app, message = _ref3.message;
+
               if (socket) {
-                _context3.next = 2;
+                _context3.next = 3;
                 break;
               }
 
               throw new Error('Socket is missing.');
 
-            case 2:
+            case 3:
               if (app) {
-                _context3.next = 4;
+                _context3.next = 5;
                 break;
               }
 
               throw new Error('App is missing.');
 
-            case 4:
+            case 5:
               if (message) {
-                _context3.next = 6;
+                _context3.next = 7;
                 break;
               }
 
               throw new Error('Message is missing.');
 
-            case 6:
+            case 7:
               logger = app.services.getLogger();
 
               if (!(!subscriptions[socket.uniqueId] || !subscriptions[socket.uniqueId][message.procedureId])) {
-                _context3.next = 9;
+                _context3.next = 10;
                 break;
               }
 
-              return _context3.abrupt('return');
+              return _context3.abrupt("return");
 
-            case 9:
+            case 10:
               unsubscribe = subscriptions[socket.uniqueId][message.procedureId];
-
-
               unsubscribe();
-              _context3.prev = 11;
-              _context3.next = 14;
-              return sendMessage(socket, { type: 'unsubscribedEvents', statusCode: 200, procedureId: message.procedureId });
+              _context3.prev = 12;
+              _context3.next = 15;
+              return sendMessage(socket, {
+                type: 'unsubscribedEvents',
+                statusCode: 200,
+                procedureId: message.procedureId
+              });
 
-            case 14:
-              _context3.next = 19;
+            case 15:
+              _context3.next = 20;
               break;
 
-            case 16:
-              _context3.prev = 16;
-              _context3.t0 = _context3['catch'](11);
+            case 17:
+              _context3.prev = 17;
+              _context3.t0 = _context3["catch"](12);
+              logger.error('Failed to send message.', {
+                ex: _context3.t0
+              });
 
-              logger.error('Failed to send message.', { ex: _context3.t0 });
-
-            case 19:
-            case 'end':
+            case 20:
+            case "end":
               return _context3.stop();
           }
         }
-      }, _callee3, this, [[11, 16]]);
+      }, _callee3, this, [[12, 17]]);
     }));
 
-    function unsubscribe(_x3, _x4) {
-      return _ref5.apply(this, arguments);
-    }
-
-    return unsubscribe;
+    return function unsubscribe(_x3, _x4) {
+      return _unsubscribe.apply(this, arguments);
+    };
   }(),
   removeAllListenersFor: function removeAllListenersFor(socket) {
     if (!socket) {
@@ -214,12 +218,10 @@ var postEvents = {
       return;
     }
 
-    (0, _keys2.default)(subscriptions[socket.uniqueId]).forEach(function (procedureId) {
+    Object.keys(subscriptions[socket.uniqueId]).forEach(function (procedureId) {
       var unsubscribe = subscriptions[socket.uniqueId][procedureId];
-
       unsubscribe();
     });
   }
 };
-
 module.exports = postEvents;

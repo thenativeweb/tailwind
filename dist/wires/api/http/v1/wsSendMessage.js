@@ -1,71 +1,64 @@
 'use strict';
 
-var _regenerator = require('babel-runtime/regenerator');
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
-var _regenerator2 = _interopRequireDefault(_regenerator);
+var _regenerator = _interopRequireDefault(require("@babel/runtime/regenerator"));
 
-var _stringify = require('babel-runtime/core-js/json/stringify');
-
-var _stringify2 = _interopRequireDefault(_stringify);
-
-var _promise = require('babel-runtime/core-js/promise');
-
-var _promise2 = _interopRequireDefault(_promise);
-
-var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
-
-var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/asyncToGenerator"));
 
 var WebSocket = require('ws');
 
-var sendMessage = function () {
-  var _ref2 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(socket, _ref) {
-    var type = _ref.type,
-        procedureId = _ref.procedureId,
-        payload = _ref.payload,
-        _ref$statusCode = _ref.statusCode,
-        statusCode = _ref$statusCode === undefined ? 200 : _ref$statusCode;
-    var message;
-    return _regenerator2.default.wrap(function _callee$(_context) {
+var sendMessage =
+/*#__PURE__*/
+function () {
+  var _ref2 = (0, _asyncToGenerator2.default)(
+  /*#__PURE__*/
+  _regenerator.default.mark(function _callee(socket, _ref) {
+    var type, procedureId, payload, _ref$statusCode, statusCode, message;
+
+    return _regenerator.default.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
+            type = _ref.type, procedureId = _ref.procedureId, payload = _ref.payload, _ref$statusCode = _ref.statusCode, statusCode = _ref$statusCode === void 0 ? 200 : _ref$statusCode;
+
             if (socket) {
-              _context.next = 2;
+              _context.next = 3;
               break;
             }
 
             throw new Error('Socket is missing.');
 
-          case 2:
+          case 3:
             if (type) {
-              _context.next = 4;
+              _context.next = 5;
               break;
             }
 
             throw new Error('Type is missing.');
 
-          case 4:
-            message = { type: type, payload: payload, statusCode: statusCode };
-
+          case 5:
+            message = {
+              type: type,
+              payload: payload,
+              statusCode: statusCode
+            };
 
             if (procedureId) {
               message.procedureId = procedureId;
             }
 
             if (!(socket.readyState !== WebSocket.OPEN)) {
-              _context.next = 8;
+              _context.next = 9;
               break;
             }
 
-            return _context.abrupt('return');
+            return _context.abrupt("return");
 
-          case 8:
-            _context.next = 10;
-            return new _promise2.default(function (resolve, reject) {
-              socket.send((0, _stringify2.default)(message), function (err) {
+          case 9:
+            _context.next = 11;
+            return new Promise(function (resolve, reject) {
+              socket.send(JSON.stringify(message), function (err) {
                 if (err) {
                   return reject(err);
                 }
@@ -74,8 +67,8 @@ var sendMessage = function () {
               });
             });
 
-          case 10:
-          case 'end':
+          case 11:
+          case "end":
             return _context.stop();
         }
       }

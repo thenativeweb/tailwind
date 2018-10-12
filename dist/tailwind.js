@@ -2,12 +2,10 @@
 
 var TailwindApp = require('./TailwindApp');
 
-var tailwindApp = void 0;
-
+var tailwindApp;
 var tailwind = {
   createApp: function createApp(options) {
     tailwindApp = new TailwindApp(options);
-
     return tailwindApp;
   },
   app: function app() {
@@ -21,5 +19,4 @@ var tailwind = {
     tailwindApp = undefined;
   }
 };
-
 module.exports = tailwind;

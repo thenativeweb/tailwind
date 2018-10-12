@@ -1,14 +1,10 @@
 'use strict';
 
-var _regenerator = require('babel-runtime/regenerator');
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
 
-var _regenerator2 = _interopRequireDefault(_regenerator);
+var _regenerator = _interopRequireDefault(require("@babel/runtime/regenerator"));
 
-var _asyncToGenerator2 = require('babel-runtime/helpers/asyncToGenerator');
-
-var _asyncToGenerator3 = _interopRequireDefault(_asyncToGenerator2);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/asyncToGenerator"));
 
 var Limes = require('limes'),
     uuid = require('uuidv4'),
@@ -25,25 +21,27 @@ var wsServer = function wsServer(_ref) {
   if (!app) {
     throw new Error('App is missing.');
   }
+
   if (!httpServer) {
     throw new Error('Http server is missing.');
   }
+
   if (!readModel) {
     throw new Error('Read model is missing.');
   }
+
   if (!writeModel) {
     throw new Error('Write model is missing.');
   }
 
   var logger = app.services.getLogger();
-
-  var webSocketServer = new WebSocket.Server({ server: httpServer });
-
+  var webSocketServer = new WebSocket.Server({
+    server: httpServer
+  });
   var limes = new Limes({
     identityProviderName: app.identityProvider.name,
     certificate: app.identityProvider.certificate
   });
-
   webSocketServer.on('connection', function (socket) {
     // Currently, sockets do not have a unique identifier. That's why we make up
     // our own here. To avoid overwriting a future uniqueId property we have an
@@ -51,177 +49,211 @@ var wsServer = function wsServer(_ref) {
     if (socket.uniqueId) {
       throw new Error('Sockets now have a uniqueId property by default.');
     }
+
     socket.uniqueId = uuid();
 
-    var onMessage = function () {
-      var _ref2 = (0, _asyncToGenerator3.default)( /*#__PURE__*/_regenerator2.default.mark(function _callee(data) {
+    var onMessage =
+    /*#__PURE__*/
+    function () {
+      var _ref2 = (0, _asyncToGenerator2.default)(
+      /*#__PURE__*/
+      _regenerator.default.mark(function _callee(data) {
         var message, api, decodedToken;
-        return _regenerator2.default.wrap(function _callee$(_context) {
+        return _regenerator.default.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                message = void 0;
-                _context.prev = 1;
-
+                _context.prev = 0;
                 message = JSON.parse(data);
-                _context.next = 16;
-                break;
-
-              case 5:
-                _context.prev = 5;
-                _context.t0 = _context['catch'](1);
-                _context.prev = 7;
-                _context.next = 10;
-                return v1.sendMessage(socket, { type: 'error', statusCode: 400, payload: 'Bad request.' });
-
-              case 10:
                 _context.next = 15;
                 break;
 
-              case 12:
-                _context.prev = 12;
-                _context.t1 = _context['catch'](7);
+              case 4:
+                _context.prev = 4;
+                _context.t0 = _context["catch"](0);
+                _context.prev = 6;
+                _context.next = 9;
+                return v1.sendMessage(socket, {
+                  type: 'error',
+                  statusCode: 400,
+                  payload: 'Bad request.'
+                });
 
-                logger.error('Failed to send message.', { exSendMessage: _context.t1 });
+              case 9:
+                _context.next = 14;
+                break;
+
+              case 11:
+                _context.prev = 11;
+                _context.t1 = _context["catch"](6);
+                logger.error('Failed to send message.', {
+                  exSendMessage: _context.t1
+                });
+
+              case 14:
+                return _context.abrupt("return");
 
               case 15:
-                return _context.abrupt('return');
-
-              case 16:
-                api = void 0;
                 _context.t2 = message.version;
-                _context.next = _context.t2 === 'v1' ? 20 : 22;
+                _context.next = _context.t2 === 'v1' ? 18 : 20;
                 break;
+
+              case 18:
+                api = v1;
+                return _context.abrupt("break", 29);
 
               case 20:
-                api = v1;
-                return _context.abrupt('break', 31);
+                _context.prev = 20;
+                _context.next = 23;
+                return v1.sendMessage(socket, {
+                  type: 'error',
+                  statusCode: 400,
+                  payload: 'Bad request.'
+                });
 
-              case 22:
-                _context.prev = 22;
-                _context.next = 25;
-                return v1.sendMessage(socket, { type: 'error', statusCode: 400, payload: 'Bad request.' });
+              case 23:
+                _context.next = 28;
+                break;
 
               case 25:
-                _context.next = 30;
-                break;
+                _context.prev = 25;
+                _context.t3 = _context["catch"](20);
+                logger.error('Failed to send message.', {
+                  ex: _context.t3
+                });
 
-              case 27:
-                _context.prev = 27;
-                _context.t3 = _context['catch'](22);
+              case 28:
+                return _context.abrupt("return");
 
-                logger.error('Failed to send message.', { ex: _context.t3 });
-
-              case 30:
-                return _context.abrupt('return');
-
-              case 31:
+              case 29:
                 if (message.procedureId) {
-                  _context.next = 41;
+                  _context.next = 39;
                   break;
                 }
 
-                _context.prev = 32;
-                _context.next = 35;
-                return api.sendMessage(socket, { type: 'error', statusCode: 400, payload: 'Procedure id is missing.' });
+                _context.prev = 30;
+                _context.next = 33;
+                return api.sendMessage(socket, {
+                  type: 'error',
+                  statusCode: 400,
+                  payload: 'Procedure id is missing.'
+                });
+
+              case 33:
+                _context.next = 38;
+                break;
 
               case 35:
-                _context.next = 40;
-                break;
+                _context.prev = 35;
+                _context.t4 = _context["catch"](30);
+                logger.error('Failed to send message.', {
+                  ex: _context.t4
+                });
 
-              case 37:
-                _context.prev = 37;
-                _context.t4 = _context['catch'](32);
+              case 38:
+                return _context.abrupt("return");
 
-                logger.error('Failed to send message.', { ex: _context.t4 });
-
-              case 40:
-                return _context.abrupt('return');
-
-              case 41:
+              case 39:
                 if (uuid.is(message.procedureId)) {
-                  _context.next = 51;
+                  _context.next = 49;
                   break;
                 }
 
-                _context.prev = 42;
-                _context.next = 45;
-                return api.sendMessage(socket, { type: 'error', statusCode: 400, payload: 'Procedure id is invalid.' });
+                _context.prev = 40;
+                _context.next = 43;
+                return api.sendMessage(socket, {
+                  type: 'error',
+                  statusCode: 400,
+                  payload: 'Procedure id is invalid.'
+                });
 
-              case 45:
-                _context.next = 50;
+              case 43:
+                _context.next = 48;
                 break;
 
-              case 47:
-                _context.prev = 47;
-                _context.t5 = _context['catch'](42);
+              case 45:
+                _context.prev = 45;
+                _context.t5 = _context["catch"](40);
+                logger.error('Failed to send message.', {
+                  ex: _context.t5
+                });
 
-                logger.error('Failed to send message.', { ex: _context.t5 });
+              case 48:
+                return _context.abrupt("return");
 
-              case 50:
-                return _context.abrupt('return');
-
-              case 51:
+              case 49:
                 if (message.token) {
-                  _context.next = 57;
+                  _context.next = 55;
                   break;
                 }
 
                 message.token = limes.issueDecodedTokenForAnonymous({
                   payloadWhenAnonymous: {}
                 });
+                _context.next = 53;
+                return api.handleMessage(socket, {
+                  app: app,
+                  message: message,
+                  readModel: readModel,
+                  writeModel: writeModel
+                });
 
-                _context.next = 55;
-                return api.handleMessage(socket, { app: app, message: message, readModel: readModel, writeModel: writeModel });
-
-              case 55:
-                _context.next = 78;
-                break;
-
-              case 57:
-                decodedToken = void 0;
-                _context.prev = 58;
-                _context.next = 61;
-                return limes.verifyToken(message.token);
-
-              case 61:
-                decodedToken = _context.sent;
+              case 53:
                 _context.next = 75;
                 break;
 
-              case 64:
-                _context.prev = 64;
-                _context.t6 = _context['catch'](58);
-                _context.prev = 66;
-                _context.next = 69;
-                return api.sendMessage(socket, { type: 'error', statusCode: 401, payload: 'Invalid token.', procedureId: message.procedureId });
+              case 55:
+                _context.prev = 55;
+                _context.next = 58;
+                return limes.verifyToken(message.token);
 
-              case 69:
-                _context.next = 74;
+              case 58:
+                decodedToken = _context.sent;
+                _context.next = 72;
                 break;
 
+              case 61:
+                _context.prev = 61;
+                _context.t6 = _context["catch"](55);
+                _context.prev = 63;
+                _context.next = 66;
+                return api.sendMessage(socket, {
+                  type: 'error',
+                  statusCode: 401,
+                  payload: 'Invalid token.',
+                  procedureId: message.procedureId
+                });
+
+              case 66:
+                _context.next = 71;
+                break;
+
+              case 68:
+                _context.prev = 68;
+                _context.t7 = _context["catch"](63);
+                logger.error('Failed to send message.', {
+                  exSendMessage: _context.t7
+                });
+
               case 71:
-                _context.prev = 71;
-                _context.t7 = _context['catch'](66);
+                return _context.abrupt("return");
 
-                logger.error('Failed to send message.', { exSendMessage: _context.t7 });
-
-              case 74:
-                return _context.abrupt('return');
+              case 72:
+                message.token = decodedToken;
+                _context.next = 75;
+                return api.handleMessage(socket, {
+                  app: app,
+                  message: message,
+                  readModel: readModel,
+                  writeModel: writeModel
+                });
 
               case 75:
-
-                message.token = decodedToken;
-
-                _context.next = 78;
-                return api.handleMessage(socket, { app: app, message: message, readModel: readModel, writeModel: writeModel });
-
-              case 78:
-              case 'end':
+              case "end":
                 return _context.stop();
             }
           }
-        }, _callee, this, [[1, 5], [7, 12], [22, 27], [32, 37], [42, 47], [58, 64], [66, 71]]);
+        }, _callee, this, [[0, 4], [6, 11], [20, 25], [30, 35], [40, 45], [55, 61], [63, 68]]);
       }));
 
       return function onMessage(_x) {
@@ -232,7 +264,6 @@ var wsServer = function wsServer(_ref) {
     var onClose = function onClose() {
       v1.postEvents.removeAllListenersFor(socket);
       v1.postRead.removeAllListenersFor(socket);
-
       socket.removeEventListener('message', onMessage);
       socket.removeEventListener('close', onClose);
     };

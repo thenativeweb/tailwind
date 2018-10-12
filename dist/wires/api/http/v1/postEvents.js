@@ -22,7 +22,6 @@ var postEvents = function postEvents(app) {
     client.once('connect', function () {
       app.api.outgoing.on('data', sendToClient);
     });
-
     client.once('disconnect', function () {
       app.api.outgoing.removeListener('data', sendToClient);
     });
