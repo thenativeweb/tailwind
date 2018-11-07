@@ -7,7 +7,7 @@ var _regenerator = _interopRequireDefault(require("@babel/runtime/regenerator"))
 var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/asyncToGenerator"));
 
 var Command = require('commands-events').Command,
-    typer = require('media-typer');
+    typer = require('content-type');
 
 var validateCommand = require('./validateCommand');
 
@@ -34,7 +34,7 @@ var postCommand = function postCommand(app, _ref) {
               return _context.abrupt("return", res.status(415).send('Header content-type must be application/json.'));
 
             case 8:
-              if (!(contentType.type !== 'application' || contentType.subtype !== 'json')) {
+              if (!(contentType.type !== 'application/json')) {
                 _context.next = 10;
                 break;
               }
