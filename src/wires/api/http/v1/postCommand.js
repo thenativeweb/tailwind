@@ -1,7 +1,7 @@
 'use strict';
 
 const Command = require('commands-events').Command,
-      typer = require('media-typer');
+      typer = require('content-type');
 
 const validateCommand = require('./validateCommand');
 
@@ -17,7 +17,7 @@ const postCommand = function (app, { writeModel }) {
         return res.status(415).send('Header content-type must be application/json.');
       }
 
-      if (contentType.type !== 'application' || contentType.subtype !== 'json') {
+      if (contentType.type !== 'application/json') {
         return res.status(415).send('Header content-type must be application/json.');
       }
 
