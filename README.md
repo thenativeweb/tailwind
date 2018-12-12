@@ -109,7 +109,6 @@ If you want to create an API I/O port which is based on `http` you have to use c
 
 ```javascript
 await app.api.use(new app.wires.api.http.Server({
-  keys: path.join(__dirname, 'keys'),
   port: 3000,
   corsOrigin: '*',
   writeModel: {
@@ -128,7 +127,6 @@ await app.api.use(new app.wires.api.http.Server({
 
 The parameters have the following meaning:
 
-- The `keys` value defines the directory from where the private key and certificate files are loaded. The files must be called `privateKey.pem` and `certificate.pem`.
 - The `port` value defines the endpoint of the API.
 - The `corsOrigin` value can be a string or an array of strings and / or regular expressions containing the domains you want to allow to access your API. If you want your API to be accessible from everywhere, set this value to `*`.
 - The `writeModel` and `readModel` values finally describe the contexts, topics, commands, events and models of your application.
@@ -357,7 +355,7 @@ This value must be the number of items to return. If `take` is not provided, it 
 
 ## Accessing tailwind using web sockets
 
-First you need to establish a web socket connection. For this, connect to the server running the tailwind application using the `wss` protocol.
+First you need to establish a web socket connection. For this, connect to the server running the tailwind application using the `ws` protocol.
 
 All messages that you are going to send must follow a given form. There is always a `type` property, which specifies the message type, and a `procedureId` which needs to be set to a uuid in v4 format, so that you can distinguish multiple requests from each other.
 

@@ -11,14 +11,6 @@ const buildEvent = require('../../../../shared/buildEvent'),
       startApp = require('./startApp');
 
 suite('wsServer', () => {
-  suiteSetup(() => {
-    // Disable SSL certificate checks to allow running these tests with a
-    // self-signed certificate.
-    /* eslint-disable no-process-env */
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-    /* eslint-enable no-process-env */
-  });
-
   suite('routes', () => {
     let app,
         socket;
@@ -28,7 +20,7 @@ suite('wsServer', () => {
     });
 
     setup(async () => {
-      socket = new WebSocket('wss://localhost:4000/');
+      socket = new WebSocket('ws://localhost:4000/');
 
       await new Promise(resolve => {
         socket.once('open', () => {

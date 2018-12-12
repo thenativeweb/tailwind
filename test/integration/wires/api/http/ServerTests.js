@@ -70,7 +70,7 @@ suite('Server', () => {
 
         await startApp({ port, corsOrigin: corsOrigin.allow });
 
-        const res = await needle('options', `https://localhost:${port}/v1/ping`, undefined, {
+        const res = await needle('options', `http://localhost:${port}/v1/ping`, undefined, {
           headers: {
             origin: corsOrigin.origin,
             'access-control-request-method': 'POST',
@@ -86,19 +86,19 @@ suite('Server', () => {
 
     suite('GET /v1/ping', () => {
       test('returns 200.', async () => {
-        const res = await needle('get', 'https://localhost:3000/v1/ping');
+        const res = await needle('get', 'http://localhost:3000/v1/ping');
 
         assert.that(res.statusCode).is.equalTo(200);
       });
 
       test('returns application/json.', async () => {
-        const res = await needle('get', 'https://localhost:3000/v1/ping');
+        const res = await needle('get', 'http://localhost:3000/v1/ping');
 
         assert.that(res.headers['content-type']).is.equalTo('application/json; charset=utf-8');
       });
 
       test('answers with api version v1.', async () => {
-        const res = await needle('get', 'https://localhost:3000/v1/ping');
+        const res = await needle('get', 'http://localhost:3000/v1/ping');
 
         assert.that(res.body).is.equalTo({ api: 'v1' });
       });
@@ -106,19 +106,19 @@ suite('Server', () => {
 
     suite('GET /v1/configuration.json', () => {
       test('returns 200.', async () => {
-        const res = await needle('get', 'https://localhost:3000/v1/configuration.json');
+        const res = await needle('get', 'http://localhost:3000/v1/configuration.json');
 
         assert.that(res.statusCode).is.equalTo(200);
       });
 
       test('returns text/javascript.', async () => {
-        const res = await needle('get', 'https://localhost:3000/v1/configuration.json');
+        const res = await needle('get', 'http://localhost:3000/v1/configuration.json');
 
         assert.that(res.headers['content-type']).is.equalTo('application/json; charset=utf-8');
       });
 
       test('serves the application configuration.', async () => {
-        const res = await needle('get', 'https://localhost:3000/v1/configuration.json');
+        const res = await needle('get', 'http://localhost:3000/v1/configuration.json');
 
         assert.that(res.body).is.ofType('object');
         assert.that(res.body.writeModel).is.equalTo({
@@ -139,14 +139,14 @@ suite('Server', () => {
 
     suite('POST /v1/command', () => {
       test('returns 415 if the content-type header is missing.', async () => {
-        const res = await needle('post', 'https://localhost:3000/v1/command', 'foobar');
+        const res = await needle('post', 'http://localhost:3000/v1/command', 'foobar');
 
         assert.that(res.statusCode).is.equalTo(415);
         assert.that(res.body).is.equalTo('Header content-type must be application/json.');
       });
 
       test('returns 415 if content-type is not set to application/json.', async () => {
-        const res = await needle('post', 'https://localhost:3000/v1/command', 'foobar', {
+        const res = await needle('post', 'http://localhost:3000/v1/command', 'foobar', {
           headers: {
             'content-type': 'text/plain'
           },
@@ -158,7 +158,7 @@ suite('Server', () => {
       });
 
       test('returns 400 if a malformed command is sent.', async () => {
-        const res = await needle('post', 'https://localhost:3000/v1/command', {
+        const res = await needle('post', 'http://localhost:3000/v1/command', {
           foo: 'bar'
         }, {
           json: true
@@ -176,7 +176,7 @@ suite('Server', () => {
           data: { foo: 'foobar' }
         });
 
-        const res = await needle('post', 'https://localhost:3000/v1/command', command, {
+        const res = await needle('post', 'http://localhost:3000/v1/command', command, {
           json: true
         });
 
@@ -192,7 +192,7 @@ suite('Server', () => {
           data: { foo: 'foobar' }
         });
 
-        const res = await needle('post', 'https://localhost:3000/v1/command', command, {
+        const res = await needle('post', 'http://localhost:3000/v1/command', command, {
           json: true
         });
 
@@ -208,7 +208,7 @@ suite('Server', () => {
           data: { foo: 'foobar' }
         });
 
-        const res = await needle('post', 'https://localhost:3000/v1/command', command, {
+        const res = await needle('post', 'http://localhost:3000/v1/command', command, {
           json: true
         });
 
@@ -231,7 +231,7 @@ suite('Server', () => {
 
           (async () => {
             try {
-              const res = await needle('post', 'https://localhost:3000/v1/command', command, {
+              const res = await needle('post', 'http://localhost:3000/v1/command', command, {
                 json: true
               });
 
@@ -268,7 +268,7 @@ suite('Server', () => {
             resolve();
           });
 
-          needle.post('https://localhost:3000/v1/command', command, {
+          needle.post('http://localhost:3000/v1/command', command, {
             json: true
           });
         });
@@ -282,7 +282,7 @@ suite('Server', () => {
         });
 
         const server = await jsonLinesClient({
-          protocol: 'https',
+          protocol: 'http',
           host: 'localhost',
           port: 3000,
           path: '/v1/events'
@@ -315,7 +315,7 @@ suite('Server', () => {
         });
 
         const server = await jsonLinesClient({
-          protocol: 'https',
+          protocol: 'http',
           host: 'localhost',
           port: 3000,
           path: '/v1/events'
@@ -365,7 +365,7 @@ suite('Server', () => {
         });
 
         const server = await jsonLinesClient({
-          protocol: 'https',
+          protocol: 'http',
           host: 'localhost',
           port: 3000,
           path: '/v1/events',
@@ -407,7 +407,7 @@ suite('Server', () => {
           };
 
           const server = await jsonLinesClient({
-            protocol: 'https',
+            protocol: 'http',
             host: 'localhost',
             port: 3000,
             path: '/v1/events'
@@ -443,7 +443,7 @@ suite('Server', () => {
           };
 
           const server = await jsonLinesClient({
-            protocol: 'https',
+            protocol: 'http',
             host: 'localhost',
             port: 3000,
             path: '/v1/events',
@@ -484,7 +484,7 @@ suite('Server', () => {
           };
 
           const server = await jsonLinesClient({
-            protocol: 'https',
+            protocol: 'http',
             host: 'localhost',
             port: 3000,
             path: '/v1/events',
@@ -533,7 +533,7 @@ suite('Server', () => {
           };
 
           const server = await jsonLinesClient({
-            protocol: 'https',
+            protocol: 'http',
             host: 'localhost',
             port: 3000,
             path: '/v1/events'
@@ -570,7 +570,7 @@ suite('Server', () => {
           };
 
           const server = await jsonLinesClient({
-            protocol: 'https',
+            protocol: 'http',
             host: 'localhost',
             port: 3000,
             path: '/v1/events',
@@ -611,7 +611,7 @@ suite('Server', () => {
           };
 
           const server = await jsonLinesClient({
-            protocol: 'https',
+            protocol: 'http',
             host: 'localhost',
             port: 3000,
             path: '/v1/events',
@@ -662,7 +662,7 @@ suite('Server', () => {
           };
 
           const server = await jsonLinesClient({
-            protocol: 'https',
+            protocol: 'http',
             host: 'localhost',
             port: 3000,
             path: '/v1/events'
@@ -711,7 +711,7 @@ suite('Server', () => {
           };
 
           const server = await jsonLinesClient({
-            protocol: 'https',
+            protocol: 'http',
             host: 'localhost',
             port: 3000,
             path: '/v1/events',
@@ -753,7 +753,7 @@ suite('Server', () => {
           };
 
           const server = await jsonLinesClient({
-            protocol: 'https',
+            protocol: 'http',
             host: 'localhost',
             port: 3000,
             path: '/v1/events',
@@ -786,7 +786,7 @@ suite('Server', () => {
       test('returns 404 when no model type is given.', async () => {
         await assert.that(async () => {
           await jsonLinesClient({
-            protocol: 'https',
+            protocol: 'http',
             host: 'localhost',
             port: 3000,
             path: '/v1/read'
@@ -797,7 +797,7 @@ suite('Server', () => {
       test('returns 404 when no model name is given.', async () => {
         await assert.that(async () => {
           await jsonLinesClient({
-            protocol: 'https',
+            protocol: 'http',
             host: 'localhost',
             port: 3000,
             path: '/v1/read/Lists'
@@ -808,7 +808,7 @@ suite('Server', () => {
       test('returns 400 when specifying a non-existent model type.', async () => {
         await assert.that(async () => {
           await jsonLinesClient({
-            protocol: 'https',
+            protocol: 'http',
             host: 'localhost',
             port: 3000,
             path: '/v1/read/non-existent/foo'
@@ -819,7 +819,7 @@ suite('Server', () => {
       test('returns 400 when specifying a non-existent model name.', async () => {
         await assert.that(async () => {
           await jsonLinesClient({
-            protocol: 'https',
+            protocol: 'http',
             host: 'localhost',
             port: 3000,
             path: '/v1/read/lists/foo'
@@ -840,7 +840,7 @@ suite('Server', () => {
         };
 
         const server = await jsonLinesClient({
-          protocol: 'https',
+          protocol: 'http',
           host: 'localhost',
           port: 3000,
           path: '/v1/read/lists/pings'
@@ -875,7 +875,7 @@ suite('Server', () => {
         };
 
         const server = await jsonLinesClient({
-          protocol: 'https',
+          protocol: 'http',
           host: 'localhost',
           port: 3000,
           path: '/v1/read/lists/pings',
@@ -916,7 +916,7 @@ suite('Server', () => {
         };
 
         const server = await jsonLinesClient({
-          protocol: 'https',
+          protocol: 'http',
           host: 'localhost',
           port: 3000,
           path: '/v1/read/lists/pings',
@@ -957,7 +957,7 @@ suite('Server', () => {
         };
 
         const server = await jsonLinesClient({
-          protocol: 'https',
+          protocol: 'http',
           host: 'localhost',
           port: 3000,
           path: '/v1/read/lists/pings'
@@ -984,7 +984,7 @@ suite('Server', () => {
         };
 
         const server = await jsonLinesClient({
-          protocol: 'https',
+          protocol: 'http',
           host: 'localhost',
           port: 3000,
           path: '/v1/read/lists/pings',
@@ -1014,7 +1014,7 @@ suite('Server', () => {
         };
 
         const server = await jsonLinesClient({
-          protocol: 'https',
+          protocol: 'http',
           host: 'localhost',
           port: 3000,
           path: '/v1/read/lists/pings'
@@ -1041,7 +1041,7 @@ suite('Server', () => {
         };
 
         const server = await jsonLinesClient({
-          protocol: 'https',
+          protocol: 'http',
           host: 'localhost',
           port: 3000,
           path: '/v1/read/lists/pings',
@@ -1071,7 +1071,7 @@ suite('Server', () => {
         };
 
         const server = await jsonLinesClient({
-          protocol: 'https',
+          protocol: 'http',
           host: 'localhost',
           port: 3000,
           path: '/v1/read/lists/pings'
@@ -1098,7 +1098,7 @@ suite('Server', () => {
         };
 
         const server = await jsonLinesClient({
-          protocol: 'https',
+          protocol: 'http',
           host: 'localhost',
           port: 3000,
           path: '/v1/read/lists/pings',
@@ -1128,7 +1128,7 @@ suite('Server', () => {
         };
 
         const server = await jsonLinesClient({
-          protocol: 'https',
+          protocol: 'http',
           host: 'localhost',
           port: 3000,
           path: '/v1/read/lists/pings',
@@ -1158,7 +1158,7 @@ suite('Server', () => {
         };
 
         const server = await jsonLinesClient({
-          protocol: 'https',
+          protocol: 'http',
           host: 'localhost',
           port: 3000,
           path: '/v1/read/lists/pings'
@@ -1185,7 +1185,7 @@ suite('Server', () => {
         };
 
         const server = await jsonLinesClient({
-          protocol: 'https',
+          protocol: 'http',
           host: 'localhost',
           port: 3000,
           path: '/v1/read/lists/pings',
@@ -1206,7 +1206,7 @@ suite('Server', () => {
       test('returns 400 when an invalid where is given.', async () => {
         await assert.that(async () => {
           await jsonLinesClient({
-            protocol: 'https',
+            protocol: 'http',
             host: 'localhost',
             port: 3000,
             path: '/v1/read/lists/pings',
@@ -1220,7 +1220,7 @@ suite('Server', () => {
       test('returns 400 when an invalid order by is given.', async () => {
         await assert.that(async () => {
           await jsonLinesClient({
-            protocol: 'https',
+            protocol: 'http',
             host: 'localhost',
             port: 3000,
             path: '/v1/read/lists/pings',
@@ -1238,7 +1238,7 @@ suite('Server', () => {
 
         await assert.that(async () => {
           await jsonLinesClient({
-            protocol: 'https',
+            protocol: 'http',
             host: 'localhost',
             port: 3000,
             path: '/v1/read/lists/pings'
@@ -1257,7 +1257,7 @@ suite('Server', () => {
         };
 
         const server = await jsonLinesClient({
-          protocol: 'https',
+          protocol: 'http',
           host: 'localhost',
           port: 3000,
           path: '/v1/read/lists/pings'
@@ -1287,7 +1287,7 @@ suite('Server', () => {
         };
 
         const server = await jsonLinesClient({
-          protocol: 'https',
+          protocol: 'http',
           host: 'localhost',
           port: 3000,
           path: '/v1/read/lists/pings'
@@ -1328,7 +1328,7 @@ suite('Server', () => {
         };
 
         const server = await jsonLinesClient({
-          protocol: 'https',
+          protocol: 'http',
           host: 'localhost',
           port: 3000,
           path: '/v1/read/lists/pings'
@@ -1361,7 +1361,7 @@ suite('Server', () => {
     });
 
     test('serves static content from given directory.', async () => {
-      const res = await needle('get', 'https://localhost:2999/test.txt');
+      const res = await needle('get', 'http://localhost:2999/test.txt');
 
       assert.that(res.statusCode).is.equalTo(200);
       assert.that(res.body).is.ofType('string');
@@ -1369,7 +1369,7 @@ suite('Server', () => {
     });
 
     test('uses gzip compression.', async () => {
-      const res = await needle('get', 'https://localhost:2999/compression-test.html', {
+      const res = await needle('get', 'http://localhost:2999/compression-test.html', {
         headers: {
           'Accept-Encoding': 'gzip, deflate'
         }

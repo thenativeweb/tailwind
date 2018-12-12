@@ -24,23 +24,7 @@ suite('Server', () => {
       /* eslint-disable no-new */
       new Server({ port: 3000 });
       /* eslint-enable no-new */
-    }).is.throwing('Keys directory is missing.');
-  });
-
-  test('throws an exception if CORS origin is missing.', async () => {
-    assert.that(() => {
-      /* eslint-disable no-new */
-      new Server({ port: 3000, keys: path.join(__dirname, '..', '..', '..', '..', 'shared', 'keys') });
-      /* eslint-enable no-new */
     }).is.throwing('CORS origin is missing.');
-  });
-
-  test('throws an exception if keys can not be loaded.', async () => {
-    assert.that(() => {
-      /* eslint-disable no-new */
-      new Server({ port: 3000, keys: __dirname, corsOrigin: '*' });
-      /* eslint-enable no-new */
-    }).is.throwing('Keys could not be loaded.');
   });
 
   test('throws if a serveStatic is not a valid path.', async () => {
@@ -48,7 +32,6 @@ suite('Server', () => {
       /* eslint-disable no-new */
       new Server({
         port: 3000,
-        keys: path.join(__dirname, '..', '..', '..', '..', 'shared', 'keys'),
         corsOrigin: '*',
         serveStatic: path.join(__dirname, 'unknown-file-or-directory')
       });
@@ -61,7 +44,6 @@ suite('Server', () => {
       /* eslint-disable no-new */
       new Server({
         port: 3000,
-        keys: path.join(__dirname, '..', '..', '..', '..', 'shared', 'keys'),
         corsOrigin: '*',
         serveStatic: path.join(__dirname, 'ServerTests.js')
       });
@@ -74,7 +56,6 @@ suite('Server', () => {
       /* eslint-disable no-new */
       new Server({
         port: 3000,
-        keys: path.join(__dirname, '..', '..', '..', '..', 'shared', 'keys'),
         corsOrigin: '*',
         serveStatic: path.join(__dirname)
       });
