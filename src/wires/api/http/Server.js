@@ -1,7 +1,7 @@
 'use strict';
 
 const fs = require('fs'),
-      path = require('path');
+      http = require('http');
 
 const bodyParser = require('body-parser'),
       compression = require('compression'),
@@ -11,19 +11,15 @@ const bodyParser = require('body-parser'),
       flatten = require('lodash/flatten'),
       lusca = require('lusca'),
       morgan = require('morgan'),
-      nocache = require('nocache'),
-      spdy = require('spdy');
+      nocache = require('nocache');
 
 const v1 = require('./v1'),
       wsServer = require('./wsServer');
 
 class Server {
-  constructor ({ port, keys, corsOrigin, readModel, serveStatic, writeModel }) {
+  constructor ({ port, corsOrigin, readModel, serveStatic, writeModel }) {
     if (!port) {
       throw new Error('Port is missing.');
-    }
-    if (!keys) {
-      throw new Error('Keys directory is missing.');
     }
     if (!corsOrigin) {
       throw new Error('CORS origin is missing.');
@@ -33,15 +29,6 @@ class Server {
       this.corsOrigin = corsOrigin;
     } else {
       this.corsOrigin = flatten([ corsOrigin ]);
-    }
-
-    try {
-      /* eslint-disable no-sync */
-      this.privateKey = fs.readFileSync(path.join(keys, 'privateKey.pem'), { encoding: 'utf8' });
-      this.certificate = fs.readFileSync(path.join(keys, 'certificate.pem'), { encoding: 'utf8' });
-      /* eslint-enable no-sync */
-    } catch (ex) {
-      throw new Error('Keys could not be loaded.');
     }
 
     if (serveStatic) {
@@ -77,7 +64,7 @@ class Server {
       throw new Error('Outgoing is missing.');
     }
 
-    const { readModel, writeModel, privateKey, certificate, port, serveStatic } = this;
+    const { readModel, writeModel, port, serveStatic } = this;
 
     const logger = app.services.getLogger();
 
@@ -111,7 +98,7 @@ class Server {
       api.use('/', express.static(serveStatic));
     }
 
-    const server = spdy.createServer({ key: privateKey, cert: certificate }, api);
+    const server = http.createServer(api);
 
     wsServer({ httpServer: server, app, readModel, writeModel });
 
