@@ -164,9 +164,11 @@ function () {
         }, _callee2, this, [[7, 13], [18, 24]]);
       }));
 
-      return function link(_x, _x2, _x3) {
+      function link(_x, _x2, _x3) {
         return _link.apply(this, arguments);
-      };
+      }
+
+      return link;
     }()
   }]);
   return Receiver;

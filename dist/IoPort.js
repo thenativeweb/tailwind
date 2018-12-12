@@ -61,9 +61,11 @@ function () {
         }, _callee, this);
       }));
 
-      return function use(_x) {
+      function use(_x) {
         return _use.apply(this, arguments);
-      };
+      }
+
+      return use;
     }()
   }]);
   return IoPort;

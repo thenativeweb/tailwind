@@ -403,9 +403,11 @@ var postRead = {
       }, _callee4, this, [[11, 16], [26, 31], [36, 41], [45, 49], [51, 56], [63, 69], [71, 76], [89, 94]]);
     }));
 
-    return function subscribe(_x, _x2) {
+    function subscribe(_x, _x2) {
       return _subscribe.apply(this, arguments);
-    };
+    }
+
+    return subscribe;
   }(),
   unsubscribe: function () {
     var _unsubscribe = (0, _asyncToGenerator2.default)(
@@ -481,9 +483,11 @@ var postRead = {
       }, _callee5, this, [[12, 17]]);
     }));
 
-    return function unsubscribe(_x3, _x4) {
+    function unsubscribe(_x3, _x4) {
       return _unsubscribe.apply(this, arguments);
-    };
+    }
+
+    return unsubscribe;
   }(),
   removeAllListenersFor: function removeAllListenersFor(socket) {
     if (!socket) {

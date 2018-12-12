@@ -121,9 +121,11 @@ function () {
         }, _callee, this);
       }));
 
-      return function link(_x, _x2, _x3) {
+      function link(_x, _x2, _x3) {
         return _link.apply(this, arguments);
-      };
+      }
+
+      return link;
     }()
   }]);
   return Server;

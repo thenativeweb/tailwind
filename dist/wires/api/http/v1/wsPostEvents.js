@@ -127,9 +127,11 @@ var postEvents = {
       }, _callee2, this, [[14, 19]]);
     }));
 
-    return function subscribe(_x, _x2) {
+    function subscribe(_x, _x2) {
       return _subscribe.apply(this, arguments);
-    };
+    }
+
+    return subscribe;
   }(),
   unsubscribe: function () {
     var _unsubscribe = (0, _asyncToGenerator2.default)(
@@ -205,9 +207,11 @@ var postEvents = {
       }, _callee3, this, [[12, 17]]);
     }));
 
-    return function unsubscribe(_x3, _x4) {
+    function unsubscribe(_x3, _x4) {
       return _unsubscribe.apply(this, arguments);
-    };
+    }
+
+    return unsubscribe;
   }(),
   removeAllListenersFor: function removeAllListenersFor(socket) {
     if (!socket) {

@@ -120,9 +120,11 @@ var postCommand = {
       }, _callee, this, [[12, 16], [18, 23], [30, 35]]);
     }));
 
-    return function send(_x, _x2) {
+    function send(_x, _x2) {
       return _send.apply(this, arguments);
-    };
+    }
+
+    return send;
   }()
 };
 module.exports = postCommand;

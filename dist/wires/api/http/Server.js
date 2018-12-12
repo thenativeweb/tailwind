@@ -11,7 +11,7 @@ var _classCallCheck2 = _interopRequireDefault(require("@babel/runtime/helpers/cl
 var _createClass2 = _interopRequireDefault(require("@babel/runtime/helpers/createClass"));
 
 var fs = require('fs'),
-    path = require('path');
+    http = require('http');
 
 var bodyParser = require('body-parser'),
     compression = require('compression'),
@@ -21,8 +21,7 @@ var bodyParser = require('body-parser'),
     flatten = require('lodash/flatten'),
     lusca = require('lusca'),
     morgan = require('morgan'),
-    nocache = require('nocache'),
-    spdy = require('spdy');
+    nocache = require('nocache');
 
 var v1 = require('./v1'),
     wsServer = require('./wsServer');
@@ -32,7 +31,6 @@ var Server =
 function () {
   function Server(_ref) {
     var port = _ref.port,
-        keys = _ref.keys,
         corsOrigin = _ref.corsOrigin,
         readModel = _ref.readModel,
         serveStatic = _ref.serveStatic,
@@ -43,10 +41,6 @@ function () {
       throw new Error('Port is missing.');
     }
 
-    if (!keys) {
-      throw new Error('Keys directory is missing.');
-    }
-
     if (!corsOrigin) {
       throw new Error('CORS origin is missing.');
     }
@@ -55,19 +49,6 @@ function () {
       this.corsOrigin = corsOrigin;
     } else {
       this.corsOrigin = flatten([corsOrigin]);
-    }
-
-    try {
-      /* eslint-disable no-sync */
-      this.privateKey = fs.readFileSync(path.join(keys, 'privateKey.pem'), {
-        encoding: 'utf8'
-      });
-      this.certificate = fs.readFileSync(path.join(keys, 'certificate.pem'), {
-        encoding: 'utf8'
-      });
-      /* eslint-enable no-sync */
-    } catch (ex) {
-      throw new Error('Keys could not be loaded.');
     }
 
     if (serveStatic) {
@@ -98,7 +79,7 @@ function () {
       var _link = (0, _asyncToGenerator2.default)(
       /*#__PURE__*/
       _regenerator.default.mark(function _callee(app, incoming, outgoing) {
-        var readModel, writeModel, privateKey, certificate, port, serveStatic, logger, api, server;
+        var readModel, writeModel, port, serveStatic, logger, api, server;
         return _regenerator.default.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
@@ -127,7 +108,7 @@ function () {
                 throw new Error('Outgoing is missing.');
 
               case 6:
-                readModel = this.readModel, writeModel = this.writeModel, privateKey = this.privateKey, certificate = this.certificate, port = this.port, serveStatic = this.serveStatic;
+                readModel = this.readModel, writeModel = this.writeModel, port = this.port, serveStatic = this.serveStatic;
                 logger = app.services.getLogger();
                 api = express();
                 api.use(morgan('tiny', {
@@ -159,10 +140,7 @@ function () {
                   api.use('/', express.static(serveStatic));
                 }
 
-                server = spdy.createServer({
-                  key: privateKey,
-                  cert: certificate
-                }, api);
+                server = http.createServer(api);
                 wsServer({
                   httpServer: server,
                   app: app,
@@ -187,9 +165,11 @@ function () {
         }, _callee, this);
       }));
 
-      return function link(_x, _x2, _x3) {
+      function link(_x, _x2, _x3) {
         return _link.apply(this, arguments);
-      };
+      }
+
+      return link;
     }()
   }]);
   return Server;
