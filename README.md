@@ -4,43 +4,6 @@ tailwind is a base module for streaming and evented CQS applications.
 
 ## Table of contents
 
-<!-- toc -->
-
-- [Installation](#installation)
-- [Quick start](#quick-start)
-  * [Enable profiling](#enable-profiling)
-  * [Configuring I/O ports](#configuring-io-ports)
-    + [Configuring the API server](#configuring-the-api-server)
-    + [Configuring the command bus, the event bus, and the flow bus](#configuring-the-command-bus-the-event-bus-and-the-flow-bus)
-    + [Configuring the status server](#configuring-the-status-server)
-  * [Handling messages](#handling-messages)
-    + [Receiving incoming messages](#receiving-incoming-messages)
-    + [Sending outgoing messages](#sending-outgoing-messages)
-    + [Handling stream errors](#handling-stream-errors)
-    + [Handling disconnects](#handling-disconnects)
-  * [Getting application information](#getting-application-information)
-    + [Accessing environment variables](#accessing-environment-variables)
-    + [Handling configuration data](#handling-configuration-data)
-    + [Using services](#using-services)
-    + [Exiting an application](#exiting-an-application)
-  * [Enabling queries on the server](#enabling-queries-on-the-server)
-- [Accessing tailwind using HTTP](#accessing-tailwind-using-http)
-  * [Sending commands](#sending-commands)
-  * [Receiving events](#receiving-events)
-  * [Querying models](#querying-models)
-    + [Specifying where clauses](#specifying-where-clauses)
-    + [Specifying order by clauses](#specifying-order-by-clauses)
-    + [Specifying skip clauses](#specifying-skip-clauses)
-    + [Specifying take clauses](#specifying-take-clauses)
-- [Accessing tailwind using web sockets](#accessing-tailwind-using-web-sockets)
-  * [Sending commands](#sending-commands-1)
-  * [Receiving events](#receiving-events-1)
-  * [Querying models](#querying-models-1)
-- [Running the build](#running-the-build)
-- [License](#license)
-
-<!-- tocstop -->
-
 ## Installation
 
 ```shell
