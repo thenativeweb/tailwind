@@ -91,7 +91,16 @@ const postRead = {
     let stream;
 
     try {
-      stream = await app.api.read(modelType, modelName, { where, orderBy, take, skip });
+      stream = await app.api.read(modelType, modelName, {
+        where,
+        orderBy,
+        take,
+        skip,
+        user: {
+          id: message.token.sub,
+          token: message.token
+        }
+      });
     } catch (ex) {
       try {
         await sendMessage(socket, { type: 'error', payload: 'Unable to load model.', statusCode: 500, procedureId: message.procedureId });

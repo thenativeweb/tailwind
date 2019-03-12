@@ -55,7 +55,16 @@ const postRead = function (app, { readModel }) {
       let stream;
 
       try {
-        stream = await app.api.read(modelType, modelName, { where, orderBy, take, skip });
+        stream = await app.api.read(modelType, modelName, {
+          where,
+          orderBy,
+          take,
+          skip,
+          user: {
+            id: req.user.sub,
+            token: req.user
+          }
+        });
       } catch (ex) {
         return res.status(500).send('Unable to load model.');
       }

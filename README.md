@@ -293,6 +293,7 @@ app.api.read = async function (modelType, modelName, options) {
   // options.orderBy
   // options.skip
   // options.take
+  // options.user
   // ...
   // return stream;
 };
@@ -406,7 +407,7 @@ $ npx roboter
 
 ## License
 
-Copyright (c) 2014-2018 the native web.
+Copyright (c) 2014-2019 the native web.
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 

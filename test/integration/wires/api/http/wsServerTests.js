@@ -1615,6 +1615,57 @@ suite('wsServer', () => {
         });
       });
 
+      test('passes the user to the app.api.read function.', async () => {
+        const ownerId = uuid();
+
+        app.api.read = async function (modelType, modelName, options) {
+          assert.that(options.user).is.atLeast({
+            id: ownerId,
+            token: {
+              iss: 'auth.wolkenkit.io',
+              sub: ownerId
+            }
+          });
+
+          const fakeStream = new PassThrough({ objectMode: true });
+
+          fakeStream.end();
+
+          return fakeStream;
+        };
+
+        await new Promise((resolve, reject) => {
+          const procedureId = uuid();
+
+          socket.once('message', message => {
+            try {
+              assert.that(JSON.parse(message)).is.equalTo({
+                type: 'subscribedRead',
+                statusCode: 200,
+                procedureId
+              });
+            } catch (ex) {
+              return reject(ex);
+            }
+            resolve();
+          });
+
+          socket.send(JSON.stringify({
+            version: 'v1',
+            type: 'subscribeRead',
+            procedureId,
+            payload: {
+              modelType: 'lists',
+              modelName: 'pings',
+              query: {
+                where: { lastName: 'Doe' }
+              }
+            },
+            token: issueToken(ownerId)
+          }));
+        });
+      });
+
       test('returns 400 when an invalid where is given.', async () => {
         await new Promise((resolve, reject) => {
           const procedureId = uuid();

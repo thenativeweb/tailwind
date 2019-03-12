@@ -1203,6 +1203,47 @@ suite('Server', () => {
         });
       });
 
+      test('passes the user to the app.api.read function.', async () => {
+        const ownerId = uuid();
+
+        app.api.read = async function (modelType, modelName, options) {
+          assert.that(options.user).is.atLeast({
+            id: ownerId,
+            token: {
+              iss: 'auth.wolkenkit.io',
+              sub: ownerId
+            }
+          });
+
+          const fakeStream = new PassThrough({ objectMode: true });
+
+          fakeStream.end();
+
+          return fakeStream;
+        };
+
+        const server = await jsonLinesClient({
+          protocol: 'http',
+          host: 'localhost',
+          port: 3000,
+          path: '/v1/read/lists/pings',
+          query: {
+            where: JSON.stringify({ lastName: 'Doe' })
+          },
+          headers: {
+            authorization: `Bearer ${issueToken(ownerId)}`
+          }
+        });
+
+        await new Promise(resolve => {
+          server.stream.once('end', () => {
+            resolve();
+          });
+
+          server.stream.resume();
+        });
+      });
+
       test('returns 400 when an invalid where is given.', async () => {
         await assert.that(async () => {
           await jsonLinesClient({
