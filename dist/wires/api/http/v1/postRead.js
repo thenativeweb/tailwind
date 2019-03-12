@@ -104,7 +104,11 @@ var postRead = function postRead(app, _ref) {
                 where: where,
                 orderBy: orderBy,
                 take: take,
-                skip: skip
+                skip: skip,
+                user: {
+                  id: req.user.sub,
+                  token: req.user
+                }
               });
 
             case 35:

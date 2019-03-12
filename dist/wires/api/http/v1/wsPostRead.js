@@ -216,7 +216,11 @@ var postRead = {
                 where: where,
                 orderBy: orderBy,
                 take: take,
-                skip: skip
+                skip: skip,
+                user: {
+                  id: message.token.sub,
+                  token: message.token
+                }
               });
 
             case 66:
