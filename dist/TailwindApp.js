@@ -119,7 +119,7 @@ function () {
               return _context.stop();
           }
         }
-      }, _callee, this);
+      }, _callee);
     }));
     this.commandbus = new IoPort(this);
     this.eventbus = new IoPort(this);

@@ -27,7 +27,7 @@ var getConfigurationJson = function getConfigurationJson(_ref) {
               return _context.stop();
           }
         }
-      }, _callee, this);
+      }, _callee);
     }))();
   };
 };

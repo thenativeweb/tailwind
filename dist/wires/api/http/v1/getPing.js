@@ -24,7 +24,7 @@ var getPing = function getPing() {
               return _context.stop();
           }
         }
-      }, _callee, this);
+      }, _callee);
     }))();
   };
 };

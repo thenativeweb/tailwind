@@ -138,7 +138,7 @@ var postRead = function postRead(app, _ref) {
               return _context.stop();
           }
         }
-      }, _callee, this, [[6, 10], [13, 17], [22, 26], [32, 38]]);
+      }, _callee, null, [[6, 10], [13, 17], [22, 26], [32, 38]]);
     }))();
   };
 };

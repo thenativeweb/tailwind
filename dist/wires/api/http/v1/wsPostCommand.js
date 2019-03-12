@@ -117,7 +117,7 @@ var postCommand = {
               return _context.stop();
           }
         }
-      }, _callee, this, [[12, 16], [18, 23], [30, 35]]);
+      }, _callee, null, [[12, 16], [18, 23], [30, 35]]);
     }));
 
     function send(_x, _x2) {

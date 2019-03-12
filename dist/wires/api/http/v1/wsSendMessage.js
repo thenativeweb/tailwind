@@ -72,7 +72,7 @@ function () {
             return _context.stop();
         }
       }
-    }, _callee, this);
+    }, _callee);
   }));
 
   return function sendMessage(_x, _x2) {

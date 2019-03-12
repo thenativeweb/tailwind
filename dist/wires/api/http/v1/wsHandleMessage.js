@@ -146,7 +146,7 @@ function () {
             return _context.stop();
         }
       }
-    }, _callee, this, [[30, 35]]);
+    }, _callee, null, [[30, 35]]);
   }));
 
   return function handleMessage(_x, _x2) {

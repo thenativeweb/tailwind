@@ -253,7 +253,7 @@ var wsServer = function wsServer(_ref) {
                 return _context.stop();
             }
           }
-        }, _callee, this, [[0, 4], [6, 11], [20, 25], [30, 35], [40, 45], [55, 61], [63, 68]]);
+        }, _callee, null, [[0, 4], [6, 11], [20, 25], [30, 35], [40, 45], [55, 61], [63, 68]]);
       }));
 
       return function onMessage(_x) {

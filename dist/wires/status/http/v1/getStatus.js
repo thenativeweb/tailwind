@@ -24,7 +24,7 @@ var getStatus = function getStatus() {
               return _context.stop();
           }
         }
-      }, _callee, this);
+      }, _callee);
     }))();
   };
 };

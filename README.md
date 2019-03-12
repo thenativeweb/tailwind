@@ -4,6 +4,39 @@ tailwind is a base module for streaming and evented CQS applications.
 
 ## Table of contents
 
+-   [Installation](#installation)
+-   [Quick start](#quick-start)
+    -   [Enable profiling](#enable-profiling)
+    -   [Configuring I/O ports](#configuring-io-ports)
+        -   [Configuring the API server](#configuring-the-api-server)
+        -   [Configuring the command bus, the event bus, and the flow bus](#configuring-the-command-bus-the-event-bus-and-the-flow-bus)
+        -   [Configuring the status server](#configuring-the-status-server)
+    -   [Handling messages](#handling-messages)
+        -   [Receiving incoming messages](#receiving-incoming-messages)
+        -   [Sending outgoing messages](#sending-outgoing-messages)
+        -   [Handling stream errors](#handling-stream-errors)
+        -   [Handling disconnects](#handling-disconnects)
+    -   [Getting application information](#getting-application-information)
+        -   [Accessing environment variables](#accessing-environment-variables)
+        -   [Handling configuration data](#handling-configuration-data)
+        -   [Using services](#using-services)
+        -   [Exiting an application](#exiting-an-application)
+    -   [Enabling queries on the server](#enabling-queries-on-the-server)
+-   [Accessing tailwind using HTTP](#accessing-tailwind-using-http)
+    -   [Sending commands](#sending-commands)
+    -   [Receiving events](#receiving-events)
+    -   [Querying models](#querying-models)
+        -   [Specifying where clauses](#specifying-where-clauses)
+        -   [Specifying order by clauses](#specifying-order-by-clauses)
+        -   [Specifying skip clauses](#specifying-skip-clauses)
+        -   [Specifying take clauses](#specifying-take-clauses)
+-   [Accessing tailwind using web sockets](#accessing-tailwind-using-web-sockets)
+    -   [Sending commands](#sending-commands-1)
+    -   [Receiving events](#receiving-events-1)
+    -   [Querying models](#querying-models-1)
+-   [Running the build](#running-the-build)
+-   [License](#license)
+
 ## Installation
 
 ```shell
@@ -90,9 +123,9 @@ await app.api.use(new app.wires.api.http.Server({
 
 The parameters have the following meaning:
 
-- The `port` value defines the endpoint of the API.
-- The `corsOrigin` value can be a string or an array of strings and / or regular expressions containing the domains you want to allow to access your API. If you want your API to be accessible from everywhere, set this value to `*`.
-- The `writeModel` and `readModel` values finally describe the contexts, topics, commands, events and models of your application.
+-   The `port` value defines the endpoint of the API.
+-   The `corsOrigin` value can be a string or an array of strings and / or regular expressions containing the domains you want to allow to access your API. If you want your API to be accessible from everywhere, set this value to `*`.
+-   The `writeModel` and `readModel` values finally describe the contexts, topics, commands, events and models of your application.
 
 To access the API you basically have two options. You can either access the API manually by calling the appropriate routes, or you can use a ready-made client module such as [wolkenkit-client-js](https://github.com/thenativeweb/wolkenkit-client-js).
 
@@ -130,8 +163,8 @@ await app.status.use(new app.wires.status.http.Server({
 
 The parameters have the following meaning:
 
-- The `port` value defines the endpoint of the status API.
-- The `corsOrigin` value can be a string or an array of strings and / or regular expressions containing the domains you want to allow to access your status API. If you want your status API to be accessible from everywhere, set this value to `*`.
+-   The `port` value defines the endpoint of the status API.
+-   The `corsOrigin` value can be a string or an array of strings and / or regular expressions containing the domains you want to allow to access your status API. If you want your status API to be accessible from everywhere, set this value to `*`.
 
 ### Handling messages
 
@@ -197,11 +230,11 @@ app.commandbus.outgoing.on('disconnect', err => {
 
 Besides the I/O ports, the `app` object provides a number of properties and functions you can use within your application.
 
-- `app.name` contains your application's name.
-- `app.version` contains your application's version.
-- `app.configuration` contains your application's `package.json` file deserialized into an object.
-- `app.dirname` contains the name of your application's root directory.
-- `app.identityProvider` contains an object that provides the identity provider's `name` and its `certificate`.
+-   `app.name` contains your application's name.
+-   `app.version` contains your application's version.
+-   `app.configuration` contains your application's `package.json` file deserialized into an object.
+-   `app.dirname` contains the name of your application's root directory.
+-   `app.identityProvider` contains an object that provides the identity provider's `name` and its `certificate`.
 
 The `name` and `version` properties are read from your application's `package.json` file.
 
@@ -229,12 +262,12 @@ app.data.get('foo'); // => 23
 
 Additionally, the `app` object also provides a number of services that may be used by your application.
 
-- `app.services.bus` is a message bus, see [draht](https://github.com/thenativeweb/draht) for details. The `get` function is automaticalled called internally, so you don't have to create a new instance.
-- `app.services.crypto` provides functions for encrypting, decrypting, signing and verifying messages, see [crypto2](https://github.com/thenativeweb/crypto2) for details.
-- `app.services.Datasette` is a key-value container, see [datasette](https://github.com/thenativeweb/datasette) for details.
-- `app.services.Emitter` is an event emitter, see [draht](https://github.com/thenativeweb/draht) for details.
-- `app.services.getLogger` returns a logger, see [flaschenpost](https://github.com/thenativeweb/flaschenpost) for details.
-- `app.services.Timer` is a timer, see [timer2](https://github.com/thenativeweb/timer2) for details.
+-   `app.services.bus` is a message bus, see [draht](https://github.com/thenativeweb/draht) for details. The `get` function is automaticalled called internally, so you don't have to create a new instance.
+-   `app.services.crypto` provides functions for encrypting, decrypting, signing and verifying messages, see [crypto2](https://github.com/thenativeweb/crypto2) for details.
+-   `app.services.Datasette` is a key-value container, see [datasette](https://github.com/thenativeweb/datasette) for details.
+-   `app.services.Emitter` is an event emitter, see [draht](https://github.com/thenativeweb/draht) for details.
+-   `app.services.getLogger` returns a logger, see [flaschenpost](https://github.com/thenativeweb/flaschenpost) for details.
+-   `app.services.Timer` is a timer, see [timer2](https://github.com/thenativeweb/timer2) for details.
 
 #### Exiting an application
 

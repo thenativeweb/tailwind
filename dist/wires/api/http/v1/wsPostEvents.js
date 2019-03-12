@@ -88,7 +88,7 @@ var postEvents = {
                             return _context.stop();
                         }
                       }
-                    }, _callee, this, [[0, 5]]);
+                    }, _callee, null, [[0, 5]]);
                   }))();
                 }
               };
@@ -124,7 +124,7 @@ var postEvents = {
               return _context2.stop();
           }
         }
-      }, _callee2, this, [[14, 19]]);
+      }, _callee2, null, [[14, 19]]);
     }));
 
     function subscribe(_x, _x2) {
@@ -204,7 +204,7 @@ var postEvents = {
               return _context3.stop();
           }
         }
-      }, _callee3, this, [[12, 17]]);
+      }, _callee3, null, [[12, 17]]);
     }));
 
     function unsubscribe(_x3, _x4) {

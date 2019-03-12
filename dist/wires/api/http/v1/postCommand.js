@@ -63,7 +63,7 @@ var postCommand = function postCommand(app, _ref) {
               return _context.stop();
           }
         }
-      }, _callee, this, [[1, 5], [10, 14]]);
+      }, _callee, null, [[1, 5], [10, 14]]);
     }))();
   };
 };

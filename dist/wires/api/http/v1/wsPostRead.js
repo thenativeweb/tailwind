@@ -294,7 +294,7 @@ var postRead = {
                           return _context.stop();
                       }
                     }
-                  }, _callee, this, [[0, 5]]);
+                  }, _callee, null, [[0, 5]]);
                 }))();
               };
 
@@ -331,7 +331,7 @@ var postRead = {
                           return _context2.stop();
                       }
                     }
-                  }, _callee2, this, [[0, 5]]);
+                  }, _callee2, null, [[0, 5]]);
                 }))();
               };
 
@@ -369,7 +369,7 @@ var postRead = {
                           return _context3.stop();
                       }
                     }
-                  }, _callee3, this, [[0, 5]]);
+                  }, _callee3, null, [[0, 5]]);
                 }))();
               };
 
@@ -400,7 +400,7 @@ var postRead = {
               return _context4.stop();
           }
         }
-      }, _callee4, this, [[11, 16], [26, 31], [36, 41], [45, 49], [51, 56], [63, 69], [71, 76], [89, 94]]);
+      }, _callee4, null, [[11, 16], [26, 31], [36, 41], [45, 49], [51, 56], [63, 69], [71, 76], [89, 94]]);
     }));
 
     function subscribe(_x, _x2) {
@@ -480,7 +480,7 @@ var postRead = {
               return _context5.stop();
           }
         }
-      }, _callee5, this, [[12, 17]]);
+      }, _callee5, null, [[12, 17]]);
     }));
 
     function unsubscribe(_x3, _x4) {
