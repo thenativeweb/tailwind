@@ -30,20 +30,44 @@ var IoPort = require('./IoPort');
 var TailwindApp =
 /*#__PURE__*/
 function () {
-  function TailwindApp(_ref) {
+  function TailwindApp() {
     var _this = this;
 
-    var identityProvider = _ref.identityProvider,
-        profiling = _ref.profiling;
+    var _ref = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : {},
+        _ref$identityProvider = _ref.identityProviders,
+        identityProviders = _ref$identityProvider === void 0 ? [] : _ref$identityProvider,
+        _ref$profiling = _ref.profiling,
+        profiling = _ref$profiling === void 0 ? {} : _ref$profiling;
+
     (0, _classCallCheck2.default)(this, TailwindApp);
+    var _iteratorNormalCompletion = true;
+    var _didIteratorError = false;
+    var _iteratorError = undefined;
 
-    if (identityProvider) {
-      if (!identityProvider.name) {
-        throw new Error('Identity provider name is missing.');
+    try {
+      for (var _iterator = identityProviders[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+        var identityProvider = _step.value;
+
+        if (!identityProvider.issuer) {
+          throw new Error('Identity provider issuer is missing.');
+        }
+
+        if (!identityProvider.certificate) {
+          throw new Error('Identity provider certificate is missing.');
+        }
       }
-
-      if (!identityProvider.certificate) {
-        throw new Error('Identity provider certificate is missing.');
+    } catch (err) {
+      _didIteratorError = true;
+      _iteratorError = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion && _iterator.return != null) {
+          _iterator.return();
+        }
+      } finally {
+        if (_didIteratorError) {
+          throw _iteratorError;
+        }
       }
     }
 
@@ -65,44 +89,62 @@ function () {
     this.data = new Datasette();
     flaschenpost.use('host', this.name);
     this.logger = flaschenpost.getLogger();
-    this.services = {};
-    this.services.bus = new Draht();
-    this.services.crypto = crypto2;
-    this.services.Datasette = Datasette;
-    this.services.Emitter = Draht;
-
-    this.services.getLogger = function (source) {
-      return flaschenpost.getLogger(source);
+    this.services = {
+      bus: new Draht(),
+      crypto: crypto2,
+      Datasette: Datasette,
+      Emitter: Draht,
+      getLogger: function getLogger(source) {
+        return flaschenpost.getLogger(source);
+      },
+      stethoskop: new Stethoskop({
+        from: {
+          application: this.name
+        },
+        to: {
+          host: profiling.host,
+          port: profiling.port
+        },
+        enabled: Boolean(profiling.host)
+      }),
+      Timer: Timer
     };
+    this.identityProviders = [];
+    var _iteratorNormalCompletion2 = true;
+    var _didIteratorError2 = false;
+    var _iteratorError2 = undefined;
 
-    this.services.stethoskop = new Stethoskop({
-      from: {
-        application: this.name
-      },
-      to: {
-        host: profiling && profiling.host,
-        port: profiling && profiling.port
-      },
-      enabled: Boolean(profiling && profiling.host)
-    });
-    this.services.Timer = Timer;
-    this.identityProvider = {};
+    try {
+      for (var _iterator2 = identityProviders[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+        var _identityProvider = _step2.value;
 
-    if (identityProvider) {
-      this.identityProvider.name = identityProvider.name;
-      /* eslint-disable no-sync */
-
-      this.identityProvider.certificate = fs.readFileSync(identityProvider.certificate, {
-        encoding: 'utf8'
-      });
-      /* eslint-enable no-sync */
+        /* eslint-disable no-sync */
+        this.identityProviders.push({
+          issuer: _identityProvider.issuer,
+          certificate: fs.readFileSync(_identityProvider.certificate, {
+            encoding: 'utf8'
+          })
+        });
+        /* eslint-enable no-sync */
+      }
+    } catch (err) {
+      _didIteratorError2 = true;
+      _iteratorError2 = err;
+    } finally {
+      try {
+        if (!_iteratorNormalCompletion2 && _iterator2.return != null) {
+          _iterator2.return();
+        }
+      } finally {
+        if (_didIteratorError2) {
+          throw _iteratorError2;
+        }
+      }
     }
 
     this.Command = Command;
     this.Event = Event;
-    this.api = new IoPort(this); // The read function takes the three parameters modelType, modelName and
-    // readOptions.
-
+    this.api = new IoPort(this);
     this.api.read =
     /*#__PURE__*/
     (0, _asyncToGenerator2.default)(
@@ -112,7 +154,7 @@ function () {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              throw new Error('Not implemented.');
+              throw new Error('Invalid operation.');
 
             case 1:
             case "end":
@@ -130,43 +172,38 @@ function () {
       // valid scenario for the API port that no client is connected. Hence,
       // simply consume potential data and throw it away.
     });
-    this.wires = {};
-    this.wires.api = {};
-    this.wires.api.http = {};
     /* eslint-disable global-require*/
 
-    this.wires.api.http.Server = require('./wires/api/http/Server');
-    /* eslint-enable global-require*/
-
-    this.wires.commandbus = {};
-    this.wires.commandbus.amqp = {};
-    /* eslint-disable global-require*/
-
-    this.wires.commandbus.amqp.Receiver = require('./wires/commandbus/amqp/Receiver');
-    this.wires.commandbus.amqp.Sender = require('./wires/commandbus/amqp/Sender');
-    /* eslint-enable global-require*/
-
-    this.wires.eventbus = {};
-    this.wires.eventbus.amqp = {};
-    /* eslint-disable global-require*/
-
-    this.wires.eventbus.amqp.Receiver = require('./wires/eventbus/amqp/Receiver');
-    this.wires.eventbus.amqp.Sender = require('./wires/eventbus/amqp/Sender');
-    /* eslint-enable global-require*/
-
-    this.wires.flowbus = {};
-    this.wires.flowbus.amqp = {};
-    /* eslint-disable global-require*/
-
-    this.wires.flowbus.amqp.Receiver = require('./wires/flowbus/amqp/Receiver');
-    this.wires.flowbus.amqp.Sender = require('./wires/flowbus/amqp/Sender');
-    /* eslint-enable global-require*/
-
-    this.wires.status = {};
-    this.wires.status.http = {};
-    /* eslint-disable global-require*/
-
-    this.wires.status.http.Server = require('./wires/status/http/Server');
+    this.wires = {
+      api: {
+        http: {
+          Server: require('./wires/api/http/Server')
+        }
+      },
+      commandbus: {
+        amqp: {
+          Receiver: require('./wires/commandbus/amqp/Receiver'),
+          Sender: require('./wires/commandbus/amqp/Sender')
+        }
+      },
+      eventbus: {
+        amqp: {
+          Receiver: require('./wires/eventbus/amqp/Receiver'),
+          Sender: require('./wires/eventbus/amqp/Sender')
+        }
+      },
+      flowbus: {
+        amqp: {
+          Receiver: require('./wires/flowbus/amqp/Receiver'),
+          Sender: require('./wires/flowbus/amqp/Sender')
+        }
+      },
+      status: {
+        http: {
+          Server: require('./wires/status/http/Server')
+        }
+      }
+    };
     /* eslint-enable global-require*/
   }
 

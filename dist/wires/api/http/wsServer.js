@@ -39,8 +39,7 @@ var wsServer = function wsServer(_ref) {
     server: httpServer
   });
   var limes = new Limes({
-    identityProviderName: app.identityProvider.name,
-    certificate: app.identityProvider.certificate
+    identityProviders: app.identityProviders
   });
   webSocketServer.on('connection', function (socket) {
     // Currently, sockets do not have a unique identifier. That's why we make up
@@ -187,8 +186,14 @@ var wsServer = function wsServer(_ref) {
                   break;
                 }
 
-                message.token = limes.issueDecodedTokenForAnonymous({
-                  payloadWhenAnonymous: {}
+                message.token = Limes.issueUntrustedTokenAsJson({
+                  // According to RFC 2606, .invalid is a reserved TLD you can use in
+                  // cases where you want to show that a domain is invalid. Since the
+                  // tokens issued for anonymous users are made-up, https://token.invalid
+                  // makes up a valid url, but we are sure that we do not run into any
+                  // conflicts with the domain.
+                  issuer: 'https://token.invalid',
+                  subject: 'anonymous'
                 });
                 _context.next = 53;
                 return api.handleMessage(socket, {
@@ -205,7 +210,9 @@ var wsServer = function wsServer(_ref) {
               case 55:
                 _context.prev = 55;
                 _context.next = 58;
-                return limes.verifyToken(message.token);
+                return limes.verifyToken({
+                  token: message.token
+                });
 
               case 58:
                 decodedToken = _context.sent;
