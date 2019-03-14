@@ -6,6 +6,7 @@ const { PassThrough } = require('stream'),
 const assert = require('assertthat'),
       jsonLinesClient = require('json-lines-client'),
       needle = require('needle'),
+      nodeenv = require('nodeenv'),
       uuid = require('uuidv4');
 
 const buildEvent = require('../../../../shared/buildEvent'),
@@ -13,12 +14,16 @@ const buildEvent = require('../../../../shared/buildEvent'),
       startApp = require('./startApp');
 
 suite('Server', () => {
+  let restoreEnvironmentVariables;
+
   suiteSetup(() => {
     // Disable SSL certificate checks to allow running these tests with a
     // self-signed certificate.
-    /* eslint-disable no-process-env */
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-    /* eslint-enable no-process-env */
+    restoreEnvironmentVariables = nodeenv('NODE_TLS_REJECT_UNAUTHORIZED', '0');
+  });
+
+  suiteTeardown(() => {
+    restoreEnvironmentVariables();
   });
 
   suite('routes', () => {
@@ -171,7 +176,7 @@ suite('Server', () => {
       test('returns 400 if a wellformed command is sent with a non-existent context name.', async () => {
         const command = new app.Command({
           context: { name: 'foo' },
-          aggregate: { name: 'node', id: 'dfa1c416-32e6-431a-8d65-27ba0fc3e978' },
+          aggregate: { name: 'node', id: uuid() },
           name: 'ping',
           data: { foo: 'foobar' }
         });
@@ -187,7 +192,7 @@ suite('Server', () => {
       test('returns 400 if a wellformed command is sent with a non-existent aggregate name.', async () => {
         const command = new app.Command({
           context: { name: 'network' },
-          aggregate: { name: 'foo', id: 'dfa1c416-32e6-431a-8d65-27ba0fc3e978' },
+          aggregate: { name: 'foo', id: uuid() },
           name: 'ping',
           data: { foo: 'foobar' }
         });
@@ -203,7 +208,7 @@ suite('Server', () => {
       test('returns 400 if a wellformed command is sent with a non-existent command name.', async () => {
         const command = new app.Command({
           context: { name: 'network' },
-          aggregate: { name: 'node', id: 'dfa1c416-32e6-431a-8d65-27ba0fc3e978' },
+          aggregate: { name: 'node', id: uuid() },
           name: 'foo',
           data: { foo: 'foobar' }
         });
@@ -219,7 +224,7 @@ suite('Server', () => {
       test('returns 200 if a wellformed command is sent and everything is fine.', async () => {
         const command = new app.Command({
           context: { name: 'network' },
-          aggregate: { name: 'node', id: 'dfa1c416-32e6-431a-8d65-27ba0fc3e978' },
+          aggregate: { name: 'node', id: uuid() },
           name: 'ping',
           data: { foo: 'foobar' }
         });
@@ -246,7 +251,7 @@ suite('Server', () => {
       test('emits an incoming command to the app.api.incoming stream.', async () => {
         const command = new app.Command({
           context: { name: 'network' },
-          aggregate: { name: 'node', id: 'dfa1c416-32e6-431a-8d65-27ba0fc3e978' },
+          aggregate: { name: 'node', id: uuid() },
           name: 'ping',
           data: { foo: 'foobar' }
         });
@@ -261,7 +266,7 @@ suite('Server', () => {
               assert.that(actual.data).is.equalTo(command.data);
               assert.that(actual.user.id).is.equalTo('anonymous');
               assert.that(actual.user.token.sub).is.equalTo('anonymous');
-              assert.that(actual.user.token.iss).is.equalTo('auth.wolkenkit.io');
+              assert.that(actual.user.token.iss).is.equalTo('https://token.invalid');
             } catch (ex) {
               return reject(ex);
             }
@@ -1206,11 +1211,11 @@ suite('Server', () => {
       test('passes the user to the app.api.read function.', async () => {
         const ownerId = uuid();
 
-        app.api.read = async function (modelType, modelName, options) {
-          assert.that(options.user).is.atLeast({
+        app.api.read = async function (modelType, modelName, { user }) {
+          assert.that(user).is.atLeast({
             id: ownerId,
             token: {
-              iss: 'auth.wolkenkit.io',
+              iss: 'https://auth.thenativeweb.io',
               sub: ownerId
             }
           });

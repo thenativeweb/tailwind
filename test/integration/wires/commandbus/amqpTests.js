@@ -1,12 +1,10 @@
 'use strict';
 
-const path = require('path');
-
 const assert = require('assertthat'),
-      shell = require('shelljs');
+      shell = require('shelljs'),
+      uuid = require('uuidv4');
 
-const env = require('../../../shared/env'),
-      tailwind = require('../../../../src/tailwind'),
+const tailwind = require('../../../../src/tailwind'),
       waitForRabbitMq = require('../../../shared/waitForRabbitMq');
 
 suite('commandbus', () => {
@@ -17,29 +15,16 @@ suite('commandbus', () => {
         appSender;
 
     setup(async () => {
-      appSender = tailwind.createApp({
-        keys: path.join(__dirname, '..', '..', '..', 'shared', 'keys'),
-        identityProvider: {
-          name: 'auth.wolkenkit.io',
-          certificate: path.join(__dirname, '..', '..', '..', 'shared', 'keys', 'certificate.pem')
-        }
-      });
-
-      appReceiver = tailwind.createApp({
-        keys: path.join(__dirname, '..', '..', '..', 'shared', 'keys'),
-        identityProvider: {
-          name: 'auth.wolkenkit.io',
-          certificate: path.join(__dirname, '..', '..', '..', 'shared', 'keys', 'certificate.pem')
-        }
-      });
+      appSender = tailwind.createApp();
+      appReceiver = tailwind.createApp();
 
       await appReceiver.commandbus.use(new appReceiver.wires.commandbus.amqp.Receiver({
-        url: env.RABBITMQ_URL,
+        url: 'amqp://wolkenkit:wolkenkit@localhost:5672',
         application: 'Plcr'
       }));
 
       await appSender.commandbus.use(new appSender.wires.commandbus.amqp.Sender({
-        url: env.RABBITMQ_URL,
+        url: 'amqp://wolkenkit:wolkenkit@localhost:5672',
         application: 'Plcr'
       }));
     });
@@ -47,7 +32,7 @@ suite('commandbus', () => {
     test('sends and receives commands.', done => {
       const command = new appSender.Command({
         context: { name: 'Planning' },
-        aggregate: { name: 'PeerGroup', id: 'dfa1c416-32e6-431a-8d65-27ba0fc3e978' },
+        aggregate: { name: 'PeerGroup', id: uuid() },
         name: 'Join',
         data: { foo: 'foobar' }
       });

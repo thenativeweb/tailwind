@@ -179,7 +179,7 @@ suite('wsServer', () => {
 
           const command = new app.Command({
             context: { name: 'Foo' },
-            aggregate: { name: 'Node', id: 'dfa1c416-32e6-431a-8d65-27ba0fc3e978' },
+            aggregate: { name: 'Node', id: uuid() },
             name: 'Ping',
             data: { foo: 'foobar' }
           });
@@ -208,7 +208,7 @@ suite('wsServer', () => {
 
           const command = new app.Command({
             context: { name: 'network' },
-            aggregate: { name: 'foo', id: 'dfa1c416-32e6-431a-8d65-27ba0fc3e978' },
+            aggregate: { name: 'foo', id: uuid() },
             name: 'ping',
             data: { foo: 'foobar' }
           });
@@ -237,7 +237,7 @@ suite('wsServer', () => {
 
           const command = new app.Command({
             context: { name: 'network' },
-            aggregate: { name: 'node', id: 'dfa1c416-32e6-431a-8d65-27ba0fc3e978' },
+            aggregate: { name: 'node', id: uuid() },
             name: 'foo',
             data: { foo: 'foobar' }
           });
@@ -266,7 +266,7 @@ suite('wsServer', () => {
 
           const command = new app.Command({
             context: { name: 'network' },
-            aggregate: { name: 'node', id: 'dfa1c416-32e6-431a-8d65-27ba0fc3e978' },
+            aggregate: { name: 'node', id: uuid() },
             name: 'ping',
             data: { foo: 'foobar' }
           });
@@ -303,7 +303,7 @@ suite('wsServer', () => {
 
           const command = new app.Command({
             context: { name: 'network' },
-            aggregate: { name: 'node', id: 'dfa1c416-32e6-431a-8d65-27ba0fc3e978' },
+            aggregate: { name: 'node', id: uuid() },
             name: 'ping',
             data: { foo: 'foobar' }
           });
@@ -317,7 +317,7 @@ suite('wsServer', () => {
               assert.that(actual.data).is.equalTo(command.data);
               assert.that(actual.user.id).is.equalTo('anonymous');
               assert.that(actual.user.token.sub).is.equalTo('anonymous');
-              assert.that(actual.user.token.iss).is.equalTo('auth.wolkenkit.io');
+              assert.that(actual.user.token.iss).is.equalTo('https://token.invalid');
             } catch (ex) {
               return reject(ex);
             }
@@ -1622,7 +1622,7 @@ suite('wsServer', () => {
           assert.that(options.user).is.atLeast({
             id: ownerId,
             token: {
-              iss: 'auth.wolkenkit.io',
+              iss: 'https://auth.thenativeweb.io',
               sub: ownerId
             }
           });

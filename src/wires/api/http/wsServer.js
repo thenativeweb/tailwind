@@ -23,11 +23,7 @@ const wsServer = function ({ app, httpServer, readModel, writeModel }) {
   const logger = app.services.getLogger();
 
   const webSocketServer = new WebSocket.Server({ server: httpServer });
-
-  const limes = new Limes({
-    identityProviderName: app.identityProvider.name,
-    certificate: app.identityProvider.certificate
-  });
+  const limes = new Limes({ identityProviders: app.identityProviders });
 
   webSocketServer.on('connection', socket => {
     // Currently, sockets do not have a unique identifier. That's why we make up
@@ -98,8 +94,14 @@ const wsServer = function ({ app, httpServer, readModel, writeModel }) {
       }
 
       if (!message.token) {
-        message.token = limes.issueDecodedTokenForAnonymous({
-          payloadWhenAnonymous: {}
+        message.token = Limes.issueUntrustedTokenAsJson({
+          // According to RFC 2606, .invalid is a reserved TLD you can use in
+          // cases where you want to show that a domain is invalid. Since the
+          // tokens issued for anonymous users are made-up, https://token.invalid
+          // makes up a valid url, but we are sure that we do not run into any
+          // conflicts with the domain.
+          issuer: 'https://token.invalid',
+          subject: 'anonymous'
         });
 
         await api.handleMessage(socket, { app, message, readModel, writeModel });
@@ -107,7 +109,7 @@ const wsServer = function ({ app, httpServer, readModel, writeModel }) {
         let decodedToken;
 
         try {
-          decodedToken = await limes.verifyToken(message.token);
+          decodedToken = await limes.verifyToken({ token: message.token });
         } catch (ex) {
           try {
             await api.sendMessage(socket, { type: 'error', statusCode: 401, payload: 'Invalid token.', procedureId: message.procedureId });

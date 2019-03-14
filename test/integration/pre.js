@@ -9,7 +9,7 @@ const pre = async function () {
   shell.exec(oneLine`
     docker run
       -d
-      -p 5673:5672
+      -p 5672:5672
       -e RABBITMQ_DEFAULT_USER=wolkenkit
       -e RABBITMQ_DEFAULT_PASS=wolkenkit
       --name rabbitmq
