@@ -2,7 +2,7 @@
 
 const assert = require('assertthat');
 
-const Server = require('../../../../../src/wires/status/http/Server');
+const Server = require('../../../../../lib/wires/status/http/Server');
 
 suite('Server', () => {
   test('is a function.', async () => {

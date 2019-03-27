@@ -6,7 +6,7 @@ const assert = require('assertthat'),
       nodeenv = require('nodeenv'),
       uuid = require('uuidv4');
 
-const TailwindApp = require('../../src/TailwindApp');
+const TailwindApp = require('../../lib/TailwindApp');
 
 suite('TailwindApp', () => {
   test('is a function.', async () => {

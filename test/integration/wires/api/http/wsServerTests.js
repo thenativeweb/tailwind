@@ -260,6 +260,35 @@ suite('wsServer', () => {
         });
       });
 
+      test('returns 400 if a wellformed command is sent with data that does not match the expected schema.', async () => {
+        await new Promise((resolve, reject) => {
+          const procedureId = uuid();
+
+          const command = new app.Command({
+            context: { name: 'network' },
+            aggregate: { name: 'node', id: uuid() },
+            name: 'ping',
+            data: { bar: 'foobar' }
+          });
+
+          socket.once('message', message => {
+            try {
+              assert.that(JSON.parse(message)).is.equalTo({
+                type: 'error',
+                payload: 'Missing required property: foo (at command.data.foo).',
+                statusCode: 400,
+                procedureId
+              });
+            } catch (ex) {
+              return reject(ex);
+            }
+            resolve();
+          });
+
+          socket.send(JSON.stringify({ version: 'v1', type: 'sendCommand', procedureId, payload: command }));
+        });
+      });
+
       test('returns 200 if a wellformed command is sent and everything is fine.', async () => {
         await new Promise((resolve, reject) => {
           const procedureId = uuid();

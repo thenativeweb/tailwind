@@ -4,7 +4,7 @@ const assert = require('assertthat'),
       shell = require('shelljs'),
       uuid = require('uuidv4');
 
-const tailwind = require('../../../../src/tailwind'),
+const tailwind = require('../../../../lib/tailwind'),
       waitForRabbitMq = require('../../../shared/waitForRabbitMq');
 
 suite('eventbus', () => {

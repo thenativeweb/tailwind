@@ -16,15 +16,13 @@
       "email": "jan-hendrik.grundhoefer@thenativeweb.io"
     }
   ],
-  "main": "dist/tailwind.js",
+  "main": "lib/tailwind.js",
   "dependencies": {
-    "@babel/runtime": "7.3.4",
-    "ajv": "6.10.0",
-    "app-root-path": "2.1.0",
+    "app-root-path": "2.2.1",
     "async-retry": "1.2.3",
     "body-parser": "1.18.3",
     "commands-events": "1.0.4",
-    "compression": "1.7.3",
+    "compression": "1.7.4",
     "content-type": "1.0.4",
     "cors": "2.8.5",
     "crypto2": "2.0.0",
@@ -44,7 +42,8 @@
     "stethoskop": "1.0.0",
     "timer2": "1.0.0",
     "uuidv4": "3.0.1",
-    "ws": "6.2.0"
+    "validate-value": "5.0.1",
+    "ws": "6.2.1"
   },
   "devDependencies": {
     "amqplib": "0.5.3",
@@ -53,7 +52,7 @@
     "json-lines-client": "1.0.1",
     "needle": "2.2.4",
     "nodeenv": "1.0.0",
-    "roboter": "4.0.2",
+    "roboter": "4.0.3",
     "shelljs": "0.8.3"
   },
   "repository": {
