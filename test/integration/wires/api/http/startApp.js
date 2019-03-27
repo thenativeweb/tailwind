@@ -26,11 +26,9 @@ const startApp = async function ({ port, corsOrigin, serveStatic }) {
             ping: {
               schema: {
                 type: 'object',
-                properties: {
-                  foo: { type: 'string', minLength: 1 }
-                },
-                required: [ 'foo' ],
-                additionalProperties: false
+                properties: {},
+                required: [],
+                additionalProperties: true
               }
             }
           },

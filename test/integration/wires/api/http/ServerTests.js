@@ -133,11 +133,9 @@ suite('Server', () => {
                 ping: {
                   schema: {
                     type: 'object',
-                    properties: {
-                      foo: { type: 'string', minLength: 1 }
-                    },
-                    required: [ 'foo' ],
-                    additionalProperties: false
+                    properties: {},
+                    required: [],
+                    additionalProperties: true
                   }
                 }
               },
@@ -232,22 +230,6 @@ suite('Server', () => {
 
         assert.that(res.statusCode).is.equalTo(400);
         assert.that(res.body).is.equalTo('Unknown command name.');
-      });
-
-      test('returns 400 if a wellformed command is sent with data that does not match the expected schema.', async () => {
-        const command = new app.Command({
-          context: { name: 'network' },
-          aggregate: { name: 'node', id: uuid() },
-          name: 'ping',
-          data: { bar: 'foobar' }
-        });
-
-        const res = await needle('post', 'http://localhost:3000/v1/command', command, {
-          json: true
-        });
-
-        assert.that(res.statusCode).is.equalTo(400);
-        assert.that(res.body).is.equalTo('Missing required property: foo (at command.data.foo).');
       });
 
       test('returns 200 if a wellformed command is sent and everything is fine.', async () => {
