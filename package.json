@@ -21,7 +21,7 @@
     "app-root-path": "2.2.1",
     "async-retry": "1.2.3",
     "body-parser": "1.18.3",
-    "commands-events": "1.0.4",
+    "commands-events": "thenativeweb/commands-events#125d78ab144207dbdcbfe78af7a3e1c880905b92",
     "compression": "1.7.4",
     "content-type": "1.0.4",
     "cors": "2.8.5",
@@ -42,7 +42,7 @@
     "stethoskop": "1.0.0",
     "timer2": "1.0.0",
     "uuidv4": "3.0.1",
-    "validate-value": "5.0.1",
+    "validate-value": "5.0.2",
     "ws": "6.2.1"
   },
   "devDependencies": {
