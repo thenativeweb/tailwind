@@ -3,6 +3,7 @@
 const { PassThrough } = require('stream');
 
 const assert = require('assertthat'),
+      freeport = require('freeport-promise'),
       uuid = require('uuidv4'),
       WebSocket = require('ws');
 
@@ -13,14 +14,14 @@ const buildEvent = require('../../../../shared/buildEvent'),
 suite('wsServer', () => {
   suite('routes', () => {
     let app,
+        port,
         socket;
 
-    suiteSetup(async () => {
-      app = await startApp({ port: 4000, corsOrigin: '*' });
-    });
-
     setup(async () => {
-      socket = new WebSocket('ws://localhost:4000/');
+      port = await freeport();
+      app = await startApp({ port, corsOrigin: '*' });
+
+      socket = new WebSocket(`ws://localhost:${port}/`);
 
       await new Promise(resolve => {
         socket.once('open', () => {
@@ -331,6 +332,10 @@ suite('wsServer', () => {
 
     suite('v1/subscribeEvents', () => {
       test('receives an event from the app.api.outgoing stream.', async () => {
+        app.api.willPublishEvent = function ({ event }) {
+          return event;
+        };
+
         await new Promise((resolve, reject) => {
           const procedureId = uuid();
           const joinedEvent = buildEvent('planning', 'peerGroup', uuid(), 'joined', {
@@ -375,6 +380,10 @@ suite('wsServer', () => {
       });
 
       test('receives multiple events from the app.api.outgoing stream.', async () => {
+        app.api.willPublishEvent = function ({ event }) {
+          return event;
+        };
+
         await new Promise((resolve, reject) => {
           const procedureId = uuid();
           const joinedEvent1 = buildEvent('planning', 'peerGroup', uuid(), 'joined', {
@@ -426,6 +435,10 @@ suite('wsServer', () => {
       });
 
       test('receives filtered events from the app.api.outgoing stream.', async () => {
+        app.api.willPublishEvent = function ({ event }) {
+          return event;
+        };
+
         await new Promise((resolve, reject) => {
           const procedureId = uuid();
           const startedEvent = buildEvent('planning', 'peerGroup', uuid(), 'started', {
@@ -477,19 +490,17 @@ suite('wsServer', () => {
         });
       });
 
-      suite('filters events based on authorization options', () => {
-        test('sends public events to public users.', async () => {
+      suite('willPublishEvent', () => {
+        test('does not filter events if willPublishEvent returns an event.', async () => {
+          app.api.willPublishEvent = function ({ event }) {
+            return event;
+          };
+
           await new Promise((resolve, reject) => {
             const procedureId = uuid();
-            const eventForPublic = buildEvent('planning', 'peerGroup', uuid(), 'joined', {
+            const event = buildEvent('planning', 'peerGroup', uuid(), 'joined', {
               participant: 'John Doe'
             });
-
-            eventForPublic.metadata.isAuthorized = {
-              owner: uuid(),
-              forAuthenticated: true,
-              forPublic: true
-            };
 
             let receivedMessages = 0;
 
@@ -504,7 +515,7 @@ suite('wsServer', () => {
                       statusCode: 200,
                       procedureId
                     });
-                    app.api.outgoing.write(eventForPublic);
+                    app.api.outgoing.write(event);
                     break;
                   }
                   case 2: {
@@ -531,18 +542,24 @@ suite('wsServer', () => {
           });
         });
 
-        test('sends public events to authenticated users.', async () => {
+        test('filters events if willPublishEvent does not return an event.', async () => {
+          app.api.willPublishEvent = function ({ event }) {
+            if (event.name === 'started') {
+              return;
+            }
+
+            return event;
+          };
+
           await new Promise((resolve, reject) => {
             const procedureId = uuid();
-            const eventForPublic = buildEvent('planning', 'peerGroup', uuid(), 'joined', {
+            const eventStarted = buildEvent('planning', 'peerGroup', uuid(), 'started', {
+              initiator: 'Jane Doe',
+              destination: 'Riva'
+            });
+            const eventJoined = buildEvent('planning', 'peerGroup', uuid(), 'joined', {
               participant: 'John Doe'
             });
-
-            eventForPublic.metadata.isAuthorized = {
-              owner: uuid(),
-              forAuthenticated: true,
-              forPublic: true
-            };
 
             let receivedMessages = 0;
 
@@ -557,130 +574,8 @@ suite('wsServer', () => {
                       statusCode: 200,
                       procedureId
                     });
-                    app.api.outgoing.write(eventForPublic);
-                    break;
-                  }
-                  case 2: {
-                    assert.that(JSON.parse(message).payload.data).is.equalTo({ participant: 'John Doe' });
-                    socket.removeListener('message', onMessage);
-                    resolve();
-                    break;
-                  }
-                  default: {
-                    reject(new Error('Should never be called.'));
-                  }
-                }
-              } catch (ex) {
-                reject(ex);
-              }
-            };
-
-            socket.on('message', onMessage);
-            socket.send(JSON.stringify({
-              version: 'v1',
-              type: 'subscribeEvents',
-              procedureId,
-              token: issueToken('Jane Doe')
-            }));
-          });
-        });
-
-        test('sends public events to owners.', async () => {
-          await new Promise((resolve, reject) => {
-            const ownerId = uuid(),
-                  procedureId = uuid();
-
-            const eventForPublic = buildEvent('planning', 'peerGroup', uuid(), 'joined', {
-              participant: 'John Doe'
-            });
-
-            eventForPublic.metadata.isAuthorized = {
-              owner: ownerId,
-              forAuthenticated: true,
-              forPublic: true
-            };
-
-            let receivedMessages = 0;
-
-            const onMessage = message => {
-              try {
-                receivedMessages += 1;
-
-                switch (receivedMessages) {
-                  case 1: {
-                    assert.that(JSON.parse(message)).is.equalTo({
-                      type: 'subscribedEvents',
-                      statusCode: 200,
-                      procedureId
-                    });
-                    app.api.outgoing.write(eventForPublic);
-                    break;
-                  }
-                  case 2: {
-                    assert.that(JSON.parse(message).payload.data).is.equalTo({ participant: 'John Doe' });
-                    socket.removeListener('message', onMessage);
-                    resolve();
-                    break;
-                  }
-                  default: {
-                    reject(new Error('Should never be called.'));
-                  }
-                }
-              } catch (ex) {
-                reject(ex);
-              }
-            };
-
-            socket.on('message', onMessage);
-            socket.send(JSON.stringify({
-              version: 'v1',
-              type: 'subscribeEvents',
-              procedureId,
-              token: issueToken(ownerId)
-            }));
-          });
-        });
-
-        test('does not send authenticated events to public users.', async () => {
-          await new Promise((resolve, reject) => {
-            const procedureId = uuid();
-
-            const eventForAuthenticated = buildEvent('planning', 'peerGroup', uuid(), 'joined', {
-              participant: 'Jane Doe'
-            });
-
-            eventForAuthenticated.metadata.isAuthorized = {
-              owner: uuid(),
-              forAuthenticated: true,
-              forPublic: false
-            };
-
-            const eventForPublic = buildEvent('planning', 'peerGroup', uuid(), 'joined', {
-              participant: 'John Doe'
-            });
-
-            eventForPublic.metadata.isAuthorized = {
-              owner: uuid(),
-              forAuthenticated: true,
-              forPublic: true
-            };
-
-            let receivedMessages = 0;
-
-            const onMessage = message => {
-              try {
-                receivedMessages += 1;
-
-                switch (receivedMessages) {
-                  case 1: {
-                    assert.that(JSON.parse(message)).is.equalTo({
-                      type: 'subscribedEvents',
-                      statusCode: 200,
-                      procedureId
-                    });
-
-                    app.api.outgoing.write(eventForAuthenticated);
-                    app.api.outgoing.write(eventForPublic);
+                    app.api.outgoing.write(eventStarted);
+                    app.api.outgoing.write(eventJoined);
                     break;
                   }
                   case 2: {
@@ -707,144 +602,25 @@ suite('wsServer', () => {
           });
         });
 
-        test('sends authenticated events to authenticated users.', async () => {
+        test('filters events if willPublishEvent throws an error.', async () => {
+          app.api.willPublishEvent = function ({ event }) {
+            if (event.name === 'started') {
+              throw new Error('Will publish event failed.');
+            }
+
+            return event;
+          };
+
           await new Promise((resolve, reject) => {
             const procedureId = uuid();
-
-            const eventForAuthenticated = buildEvent('planning', 'peerGroup', uuid(), 'joined', {
-              participant: 'Jane Doe'
+            const eventStarted = buildEvent('planning', 'peerGroup', uuid(), 'started', {
+              initiator: 'Jane Doe',
+              destination: 'Riva'
             });
-
-            eventForAuthenticated.metadata.isAuthorized = {
-              owner: uuid(),
-              forAuthenticated: true,
-              forPublic: false
-            };
-
-            let receivedMessages = 0;
-
-            const onMessage = message => {
-              try {
-                receivedMessages += 1;
-
-                switch (receivedMessages) {
-                  case 1: {
-                    assert.that(JSON.parse(message)).is.equalTo({
-                      type: 'subscribedEvents',
-                      statusCode: 200,
-                      procedureId
-                    });
-
-                    app.api.outgoing.write(eventForAuthenticated);
-                    break;
-                  }
-                  case 2: {
-                    assert.that(JSON.parse(message).payload.data).is.equalTo({ participant: 'Jane Doe' });
-                    socket.removeListener('message', onMessage);
-                    resolve();
-                    break;
-                  }
-                  default: {
-                    reject(new Error('Should never be called.'));
-                  }
-                }
-              } catch (ex) {
-                reject(ex);
-              }
-            };
-
-            socket.on('message', onMessage);
-            socket.send(JSON.stringify({
-              version: 'v1',
-              type: 'subscribeEvents',
-              procedureId,
-              token: issueToken('Jane Doe')
-            }));
-          });
-        });
-
-        test('sends authenticated events to owners.', async () => {
-          await new Promise((resolve, reject) => {
-            const procedureId = uuid();
-            const ownerId = uuid();
-
-            const eventForAuthenticated = buildEvent('planning', 'peerGroup', uuid(), 'joined', {
-              participant: 'Jane Doe'
-            });
-
-            eventForAuthenticated.metadata.isAuthorized = {
-              owner: ownerId,
-              forAuthenticated: true,
-              forPublic: false
-            };
-
-            let receivedMessages = 0;
-
-            const onMessage = message => {
-              try {
-                receivedMessages += 1;
-
-                switch (receivedMessages) {
-                  case 1: {
-                    assert.that(JSON.parse(message)).is.equalTo({
-                      type: 'subscribedEvents',
-                      statusCode: 200,
-                      procedureId
-                    });
-
-                    app.api.outgoing.write(eventForAuthenticated);
-                    break;
-                  }
-                  case 2: {
-                    assert.that(JSON.parse(message).payload.data).is.equalTo({ participant: 'Jane Doe' });
-                    socket.removeListener('message', onMessage);
-                    resolve();
-                    break;
-                  }
-                  default: {
-                    reject(new Error('Should never be called.'));
-                  }
-                }
-              } catch (ex) {
-                reject(ex);
-              }
-            };
-
-            socket.on('message', onMessage);
-            socket.send(JSON.stringify({
-              version: 'v1',
-              type: 'subscribeEvents',
-              procedureId,
-              token: issueToken(ownerId)
-            }));
-          });
-        });
-
-        test('does not send owner events to public users.', async () => {
-          await new Promise((resolve, reject) => {
-            const procedureId = uuid();
-            const ownerId = uuid();
-
-            const eventForOwner = buildEvent('planning', 'peerGroup', uuid(), 'joined', {
-              participant: 'Jane Doe'
-            });
-
-            eventForOwner.metadata.isAuthorized = {
-              owner: ownerId,
-              forAuthenticated: false,
-              forPublic: false
-            };
-
-            const eventForPublic = buildEvent('planning', 'peerGroup', uuid(), 'joined', {
+            const eventJoined = buildEvent('planning', 'peerGroup', uuid(), 'joined', {
               participant: 'John Doe'
             });
 
-            eventForPublic.metadata.isAuthorized = {
-              owner: uuid(),
-              forAuthenticated: true,
-              forPublic: true
-            };
-
             let receivedMessages = 0;
 
             const onMessage = message => {
@@ -858,9 +634,8 @@ suite('wsServer', () => {
                       statusCode: 200,
                       procedureId
                     });
-
-                    app.api.outgoing.write(eventForOwner);
-                    app.api.outgoing.write(eventForPublic);
+                    app.api.outgoing.write(eventStarted);
+                    app.api.outgoing.write(eventJoined);
                     break;
                   }
                   case 2: {
@@ -883,131 +658,6 @@ suite('wsServer', () => {
               version: 'v1',
               type: 'subscribeEvents',
               procedureId
-            }));
-          });
-        });
-
-        test('does not send owner events to authenticated users.', async () => {
-          await new Promise((resolve, reject) => {
-            const procedureId = uuid();
-            const ownerId = uuid();
-
-            const eventForOwner = buildEvent('planning', 'peerGroup', uuid(), 'joined', {
-              participant: 'Jane Doe'
-            });
-
-            eventForOwner.metadata.isAuthorized = {
-              owner: ownerId,
-              forAuthenticated: false,
-              forPublic: false
-            };
-
-            const eventForPublic = buildEvent('planning', 'peerGroup', uuid(), 'joined', {
-              participant: 'John Doe'
-            });
-
-            eventForPublic.metadata.isAuthorized = {
-              owner: uuid(),
-              forAuthenticated: true,
-              forPublic: true
-            };
-
-            let receivedMessages = 0;
-
-            const onMessage = message => {
-              try {
-                receivedMessages += 1;
-
-                switch (receivedMessages) {
-                  case 1: {
-                    assert.that(JSON.parse(message)).is.equalTo({
-                      type: 'subscribedEvents',
-                      statusCode: 200,
-                      procedureId
-                    });
-
-                    app.api.outgoing.write(eventForOwner);
-                    app.api.outgoing.write(eventForPublic);
-                    break;
-                  }
-                  case 2: {
-                    assert.that(JSON.parse(message).payload.data).is.equalTo({ participant: 'John Doe' });
-                    socket.removeListener('message', onMessage);
-                    resolve();
-                    break;
-                  }
-                  default: {
-                    reject(new Error('Should never be called.'));
-                  }
-                }
-              } catch (ex) {
-                reject(ex);
-              }
-            };
-
-            socket.on('message', onMessage);
-            socket.send(JSON.stringify({
-              version: 'v1',
-              type: 'subscribeEvents',
-              procedureId,
-              token: issueToken('Jane Doe')
-            }));
-          });
-        });
-
-        test('sends owner events to owners.', async () => {
-          await new Promise((resolve, reject) => {
-            const procedureId = uuid();
-            const ownerId = uuid();
-
-            const eventForOwner = buildEvent('planning', 'peerGroup', uuid(), 'joined', {
-              participant: 'Jane Doe'
-            });
-
-            eventForOwner.metadata.isAuthorized = {
-              owner: ownerId,
-              forAuthenticated: false,
-              forPublic: false
-            };
-
-            let receivedMessages = 0;
-
-            const onMessage = message => {
-              try {
-                receivedMessages += 1;
-
-                switch (receivedMessages) {
-                  case 1: {
-                    assert.that(JSON.parse(message)).is.equalTo({
-                      type: 'subscribedEvents',
-                      statusCode: 200,
-                      procedureId
-                    });
-
-                    app.api.outgoing.write(eventForOwner);
-                    break;
-                  }
-                  case 2: {
-                    assert.that(JSON.parse(message).payload.data).is.equalTo({ participant: 'Jane Doe' });
-                    socket.removeListener('message', onMessage);
-                    resolve();
-                    break;
-                  }
-                  default: {
-                    reject(new Error('Should never be called.'));
-                  }
-                }
-              } catch (ex) {
-                reject(ex);
-              }
-            };
-
-            socket.on('message', onMessage);
-            socket.send(JSON.stringify({
-              version: 'v1',
-              type: 'subscribeEvents',
-              procedureId,
-              token: issueToken(ownerId)
             }));
           });
         });
@@ -1097,7 +747,7 @@ suite('wsServer', () => {
       });
 
       test('passes the given model type and model name to the app.api.read function.', async () => {
-        app.api.read = async function (modelType, modelName) {
+        app.api.read = async function ({ modelType, modelName }) {
           assert.that(modelType).is.equalTo('lists');
           assert.that(modelName).is.equalTo('pings');
 
@@ -1137,8 +787,8 @@ suite('wsServer', () => {
       });
 
       test('passes the given where to the app.api.read function.', async () => {
-        app.api.read = async function (modelType, modelName, options) {
-          assert.that(options.where).is.equalTo({
+        app.api.read = async function ({ query: { where }}) {
+          assert.that(where).is.equalTo({
             $and: [
               { lastName: 'Doe' },
               { $or: [
@@ -1189,8 +839,8 @@ suite('wsServer', () => {
       test('attaches the authenticated user to the where clause.', async () => {
         const ownerId = uuid();
 
-        app.api.read = async function (modelType, modelName, options) {
-          assert.that(options.where).is.equalTo({
+        app.api.read = async function ({ query: { where }}) {
+          assert.that(where).is.equalTo({
             $and: [
               { lastName: 'Doe' },
               { $or: [
@@ -1241,8 +891,8 @@ suite('wsServer', () => {
       });
 
       test('falls back to an empty where if where is missing.', async () => {
-        app.api.read = async function (modelType, modelName, options) {
-          assert.that(options.where).is.equalTo({
+        app.api.read = async function ({ query: { where }}) {
+          assert.that(where).is.equalTo({
             $and: [
               {},
               { $or: [
@@ -1289,8 +939,8 @@ suite('wsServer', () => {
       });
 
       test('passes the given order by to the app.api.read function.', async () => {
-        app.api.read = async function (modelType, modelName, options) {
-          assert.that(options.orderBy).is.equalTo({ lastName: 'ascending' });
+        app.api.read = async function ({ query: { orderBy }}) {
+          assert.that(orderBy).is.equalTo({ lastName: 'ascending' });
 
           const fakeStream = new PassThrough({ objectMode: true });
 
@@ -1331,8 +981,8 @@ suite('wsServer', () => {
       });
 
       test('falls back to an empty order by if order by is missing.', async () => {
-        app.api.read = async function (modelType, modelName, options) {
-          assert.that(options.orderBy).is.equalTo({});
+        app.api.read = async function ({ query: { orderBy }}) {
+          assert.that(orderBy).is.equalTo({});
 
           const fakeStream = new PassThrough({ objectMode: true });
 
@@ -1370,8 +1020,8 @@ suite('wsServer', () => {
       });
 
       test('passes the given skip to the app.api.read function.', async () => {
-        app.api.read = async function (modelType, modelName, options) {
-          assert.that(options.skip).is.equalTo(23);
+        app.api.read = async function ({ query: { skip }}) {
+          assert.that(skip).is.equalTo(23);
 
           const fakeStream = new PassThrough({ objectMode: true });
 
@@ -1412,8 +1062,8 @@ suite('wsServer', () => {
       });
 
       test('falls back to skip=0 if skip is missing.', async () => {
-        app.api.read = async function (modelType, modelName, options) {
-          assert.that(options.skip).is.equalTo(0);
+        app.api.read = async function ({ query: { skip }}) {
+          assert.that(skip).is.equalTo(0);
 
           const fakeStream = new PassThrough({ objectMode: true });
 
@@ -1451,8 +1101,8 @@ suite('wsServer', () => {
       });
 
       test('falls back to skip=0 if skip is invalid.', async () => {
-        app.api.read = async function (modelType, modelName, options) {
-          assert.that(options.skip).is.equalTo(0);
+        app.api.read = async function ({ query: { skip }}) {
+          assert.that(skip).is.equalTo(0);
 
           const fakeStream = new PassThrough({ objectMode: true });
 
@@ -1493,8 +1143,8 @@ suite('wsServer', () => {
       });
 
       test('passes the given take to the app.api.read function.', async () => {
-        app.api.read = async function (modelType, modelName, options) {
-          assert.that(options.take).is.equalTo(23);
+        app.api.read = async function ({ query: { take }}) {
+          assert.that(take).is.equalTo(23);
 
           const fakeStream = new PassThrough({ objectMode: true });
 
@@ -1535,8 +1185,8 @@ suite('wsServer', () => {
       });
 
       test('falls back to take=100 if take is missing.', async () => {
-        app.api.read = async function (modelType, modelName, options) {
-          assert.that(options.take).is.equalTo(100);
+        app.api.read = async function ({ query: { take }}) {
+          assert.that(take).is.equalTo(100);
 
           const fakeStream = new PassThrough({ objectMode: true });
 
@@ -1574,8 +1224,8 @@ suite('wsServer', () => {
       });
 
       test('falls back to take=100 if take is invalid.', async () => {
-        app.api.read = async function (modelType, modelName, options) {
-          assert.that(options.take).is.equalTo(100);
+        app.api.read = async function ({ query: { take }}) {
+          assert.that(take).is.equalTo(100);
 
           const fakeStream = new PassThrough({ objectMode: true });
 
@@ -1618,8 +1268,8 @@ suite('wsServer', () => {
       test('passes the user to the app.api.read function.', async () => {
         const ownerId = uuid();
 
-        app.api.read = async function (modelType, modelName, options) {
-          assert.that(options.user).is.atLeast({
+        app.api.read = async function ({ user }) {
+          assert.that(user).is.atLeast({
             id: ownerId,
             token: {
               iss: 'https://auth.thenativeweb.io',

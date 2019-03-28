@@ -49,6 +49,7 @@
     "amqplib": "0.5.3",
     "assertthat": "2.0.3",
     "common-tags": "1.8.0",
+    "freeport-promise": "1.1.0",
     "json-lines-client": "1.0.1",
     "needle": "2.2.4",
     "nodeenv": "1.0.0",
