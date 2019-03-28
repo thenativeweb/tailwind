@@ -316,9 +316,9 @@ suite('wsServer', () => {
               assert.that(actual.aggregate.id).is.equalTo(command.aggregate.id);
               assert.that(actual.name).is.equalTo(command.name);
               assert.that(actual.data).is.equalTo(command.data);
-              assert.that(actual.user.id).is.equalTo('anonymous');
-              assert.that(actual.user.token.sub).is.equalTo('anonymous');
-              assert.that(actual.user.token.iss).is.equalTo('https://token.invalid');
+              assert.that(actual.initiator.id).is.equalTo('anonymous');
+              assert.that(actual.initiator.token.sub).is.equalTo('anonymous');
+              assert.that(actual.initiator.token.iss).is.equalTo('https://token.invalid');
             } catch (ex) {
               return reject(ex);
             }

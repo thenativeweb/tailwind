@@ -21,7 +21,7 @@
     "app-root-path": "2.2.1",
     "async-retry": "1.2.3",
     "body-parser": "1.18.3",
-    "commands-events": "thenativeweb/commands-events#125d78ab144207dbdcbfe78af7a3e1c880905b92",
+    "commands-events": "thenativeweb/commands-events#313ce3cd1d978fee16c6217d8b1e1c6564d2b99b",
     "compression": "1.7.4",
     "content-type": "1.0.4",
     "cors": "2.8.5",
