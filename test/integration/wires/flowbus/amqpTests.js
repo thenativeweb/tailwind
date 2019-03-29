@@ -41,20 +41,28 @@ suite('flowbus', () => {
         }
       });
 
-      appReceiver.flowbus.incoming.once('data', actual => {
-        actual.next();
-        assert.that(actual.context.name).is.equalTo(event.context.name);
-        assert.that(actual.aggregate.name).is.equalTo(event.aggregate.name);
-        assert.that(actual.aggregate.id).is.equalTo(event.aggregate.id);
-        assert.that(actual.name).is.equalTo(event.name);
-        assert.that(actual.id).is.equalTo(event.id);
-        assert.that(actual.data).is.equalTo(event.data);
-        assert.that(actual.metadata.correlationId).is.equalTo(event.metadata.correlationId);
-        assert.that(actual.metadata.causationId).is.equalTo(event.metadata.causationId);
+      const metadata = { foo: 'bar' };
+
+      appReceiver.flowbus.incoming.once('data', message => {
+        const receivedEvent = message.event,
+              receivedMetadata = message.metadata;
+
+        message.actions.next();
+
+        assert.that(receivedEvent.context.name).is.equalTo(event.context.name);
+        assert.that(receivedEvent.aggregate.name).is.equalTo(event.aggregate.name);
+        assert.that(receivedEvent.aggregate.id).is.equalTo(event.aggregate.id);
+        assert.that(receivedEvent.name).is.equalTo(event.name);
+        assert.that(receivedEvent.id).is.equalTo(event.id);
+        assert.that(receivedEvent.data).is.equalTo(event.data);
+        assert.that(receivedEvent.metadata.correlationId).is.equalTo(event.metadata.correlationId);
+        assert.that(receivedEvent.metadata.causationId).is.equalTo(event.metadata.causationId);
+
+        assert.that(receivedMetadata).is.equalTo(metadata);
         done();
       });
 
-      appSender.flowbus.outgoing.write(event);
+      appSender.flowbus.outgoing.write({ event, metadata });
     });
 
     suite('incoming', () => {

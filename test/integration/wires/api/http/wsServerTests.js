@@ -309,16 +309,26 @@ suite('wsServer', () => {
             data: { foo: 'foobar' }
           });
 
-          app.api.incoming.once('data', actual => {
+          app.api.incoming.once('data', message => {
             try {
-              assert.that(actual.context.name).is.equalTo(command.context.name);
-              assert.that(actual.aggregate.name).is.equalTo(command.aggregate.name);
-              assert.that(actual.aggregate.id).is.equalTo(command.aggregate.id);
-              assert.that(actual.name).is.equalTo(command.name);
-              assert.that(actual.data).is.equalTo(command.data);
-              assert.that(actual.initiator.id).is.equalTo('anonymous');
-              assert.that(actual.initiator.token.sub).is.equalTo('anonymous');
-              assert.that(actual.initiator.token.iss).is.equalTo('https://token.invalid');
+              const receivedCommand = message.command,
+                    receivedMetadata = message.metadata;
+
+              assert.that(receivedCommand.context.name).is.equalTo(command.context.name);
+              assert.that(receivedCommand.aggregate.name).is.equalTo(command.aggregate.name);
+              assert.that(receivedCommand.aggregate.id).is.equalTo(command.aggregate.id);
+              assert.that(receivedCommand.name).is.equalTo(command.name);
+              assert.that(receivedCommand.data).is.equalTo(command.data);
+              assert.that(receivedCommand.initiator.id).is.equalTo('anonymous');
+              assert.that(receivedCommand.initiator.token.sub).is.equalTo('anonymous');
+              assert.that(receivedCommand.initiator.token.iss).is.equalTo('https://token.invalid');
+
+              assert.that(receivedMetadata.client).is.ofType('object');
+              assert.that(receivedMetadata.client.user).is.ofType('object');
+              assert.that(receivedMetadata.client.user.id).is.equalTo('anonymous');
+              assert.that(receivedMetadata.client.user.token).is.ofType('object');
+              assert.that(receivedMetadata.client.user.token.sub).is.equalTo('anonymous');
+              assert.that(receivedMetadata.client.ip).is.ofType('string');
             } catch (ex) {
               return reject(ex);
             }
@@ -356,7 +366,7 @@ suite('wsServer', () => {
                     procedureId
                   });
 
-                  app.api.outgoing.write(joinedEvent);
+                  app.api.outgoing.write({ event: joinedEvent, metadata: {}});
                   break;
                 }
                 case 2: {
@@ -406,12 +416,12 @@ suite('wsServer', () => {
                     statusCode: 200,
                     procedureId
                   });
-                  app.api.outgoing.write(joinedEvent1);
+                  app.api.outgoing.write({ event: joinedEvent1, metadata: {}});
                   break;
                 }
                 case 2: {
                   assert.that(JSON.parse(message).payload.data).is.equalTo({ participant: 'Jane Doe' });
-                  app.api.outgoing.write(joinedEvent2);
+                  app.api.outgoing.write({ event: joinedEvent2, metadata: {}});
                   break;
                 }
                 case 3: {
@@ -461,8 +471,8 @@ suite('wsServer', () => {
                     statusCode: 200,
                     procedureId
                   });
-                  app.api.outgoing.write(startedEvent);
-                  app.api.outgoing.write(joinedEvent);
+                  app.api.outgoing.write({ event: startedEvent, metadata: {}});
+                  app.api.outgoing.write({ event: joinedEvent, metadata: {}});
                   break;
                 }
                 case 2: {
@@ -491,6 +501,68 @@ suite('wsServer', () => {
       });
 
       suite('willPublishEvent', () => {
+        test('is called with an event and metadata.', async () => {
+          const procedureId = uuid();
+
+          const joinedEvent = buildEvent('planning', 'peerGroup', uuid(), 'joined', {
+            participant: 'Jane Doe'
+          });
+
+          const joinedMetadata = { foo: 'bar' };
+
+          app.api.willPublishEvent = function ({ event, metadata }) {
+            assert.that(event.data).is.equalTo({ participant: 'Jane Doe' });
+            assert.that(metadata.foo).is.equalTo('bar');
+            assert.that(metadata.client).is.ofType('object');
+            assert.that(metadata.client.user).is.ofType('object');
+            assert.that(metadata.client.user.id).is.equalTo('anonymous');
+            assert.that(metadata.client.user.token).is.ofType('object');
+            assert.that(metadata.client.user.token.sub).is.equalTo('anonymous');
+            assert.that(metadata.client.ip).is.ofType('string');
+
+            return event;
+          };
+
+          await new Promise((resolve, reject) => {
+            let receivedMessages = 0;
+
+            const onMessage = message => {
+              try {
+                receivedMessages += 1;
+
+                switch (receivedMessages) {
+                  case 1: {
+                    assert.that(JSON.parse(message)).is.equalTo({
+                      type: 'subscribedEvents',
+                      statusCode: 200,
+                      procedureId
+                    });
+                    app.api.outgoing.write({ event: joinedEvent, metadata: joinedMetadata });
+                    break;
+                  }
+                  case 2: {
+                    socket.removeListener('message', onMessage);
+                    resolve();
+                    break;
+                  }
+                  default: {
+                    reject(new Error('Should never be called.'));
+                  }
+                }
+              } catch (ex) {
+                reject(ex);
+              }
+            };
+
+            socket.on('message', onMessage);
+            socket.send(JSON.stringify({
+              version: 'v1',
+              type: 'subscribeEvents',
+              procedureId
+            }));
+          });
+        });
+
         test('does not filter events if willPublishEvent returns an event.', async () => {
           app.api.willPublishEvent = function ({ event }) {
             return event;
@@ -515,7 +587,7 @@ suite('wsServer', () => {
                       statusCode: 200,
                       procedureId
                     });
-                    app.api.outgoing.write(event);
+                    app.api.outgoing.write({ event, metadata: {}});
                     break;
                   }
                   case 2: {
@@ -574,8 +646,8 @@ suite('wsServer', () => {
                       statusCode: 200,
                       procedureId
                     });
-                    app.api.outgoing.write(eventStarted);
-                    app.api.outgoing.write(eventJoined);
+                    app.api.outgoing.write({ event: eventStarted, metadata: {}});
+                    app.api.outgoing.write({ event: eventJoined, metadata: {}});
                     break;
                   }
                   case 2: {
@@ -634,8 +706,8 @@ suite('wsServer', () => {
                       statusCode: 200,
                       procedureId
                     });
-                    app.api.outgoing.write(eventStarted);
-                    app.api.outgoing.write(eventJoined);
+                    app.api.outgoing.write({ event: eventStarted, metadata: {}});
+                    app.api.outgoing.write({ event: eventJoined, metadata: {}});
                     break;
                   }
                   case 2: {
