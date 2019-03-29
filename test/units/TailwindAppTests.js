@@ -241,6 +241,22 @@ suite('TailwindApp', () => {
     });
   });
 
+  suite('ReadableAggregate', () => {
+    test('is a function.', async () => {
+      const app = new TailwindApp();
+
+      assert.that(app.ReadableAggregate).is.ofType('function');
+    });
+  });
+
+  suite('WritableAggregate', () => {
+    test('is a function.', async () => {
+      const app = new TailwindApp();
+
+      assert.that(app.WritableAggregate).is.ofType('function');
+    });
+  });
+
   suite('Command', () => {
     test('is a function.', async () => {
       const app = new TailwindApp();
