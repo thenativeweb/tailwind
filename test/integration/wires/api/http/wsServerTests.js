@@ -860,15 +860,7 @@ suite('wsServer', () => {
 
       test('passes the given where to the app.api.read function.', async () => {
         app.api.read = async function ({ query: { where }}) {
-          assert.that(where).is.equalTo({
-            $and: [
-              { lastName: 'Doe' },
-              { $or: [
-                { 'isAuthorized.owner': 'anonymous' },
-                { 'isAuthorized.forPublic': true }
-              ]}
-            ]
-          });
+          assert.that(where).is.equalTo({ lastName: 'Doe' });
 
           const fakeStream = new PassThrough({ objectMode: true });
 
@@ -904,75 +896,13 @@ suite('wsServer', () => {
                 where: { lastName: 'Doe' }
               }
             }
-          }));
-        });
-      });
-
-      test('attaches the authenticated user to the where clause.', async () => {
-        const ownerId = uuid();
-
-        app.api.read = async function ({ query: { where }}) {
-          assert.that(where).is.equalTo({
-            $and: [
-              { lastName: 'Doe' },
-              { $or: [
-                { 'isAuthorized.owner': ownerId },
-                { 'isAuthorized.forPublic': true },
-                { 'isAuthorized.forAuthenticated': true }
-              ]}
-            ]
-          });
-
-          const fakeStream = new PassThrough({ objectMode: true });
-
-          fakeStream.end();
-
-          return fakeStream;
-        };
-
-        await new Promise((resolve, reject) => {
-          const procedureId = uuid();
-
-          socket.once('message', message => {
-            try {
-              assert.that(JSON.parse(message)).is.equalTo({
-                type: 'subscribedRead',
-                statusCode: 200,
-                procedureId
-              });
-            } catch (ex) {
-              return reject(ex);
-            }
-            resolve();
-          });
-
-          socket.send(JSON.stringify({
-            version: 'v1',
-            type: 'subscribeRead',
-            procedureId,
-            payload: {
-              modelType: 'lists',
-              modelName: 'pings',
-              query: {
-                where: { lastName: 'Doe' }
-              }
-            },
-            token: issueToken(ownerId)
           }));
         });
       });
 
       test('falls back to an empty where if where is missing.', async () => {
         app.api.read = async function ({ query: { where }}) {
-          assert.that(where).is.equalTo({
-            $and: [
-              {},
-              { $or: [
-                { 'isAuthorized.owner': 'anonymous' },
-                { 'isAuthorized.forPublic': true }
-              ]}
-            ]
-          });
+          assert.that(where).is.equalTo({});
 
           const fakeStream = new PassThrough({ objectMode: true });
 

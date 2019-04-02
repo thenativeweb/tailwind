@@ -647,15 +647,7 @@ suite('Server', () => {
 
       test('passes the given where to the app.api.read function.', async () => {
         app.api.read = async function ({ query: { where }}) {
-          assert.that(where).is.equalTo({
-            $and: [
-              { lastName: 'Doe' },
-              { $or: [
-                { 'isAuthorized.owner': 'anonymous' },
-                { 'isAuthorized.forPublic': true }
-              ]}
-            ]
-          });
+          assert.that(where).is.equalTo({ lastName: 'Doe' });
 
           const fakeStream = new PassThrough({ objectMode: true });
 
@@ -671,50 +663,6 @@ suite('Server', () => {
           path: '/v1/read/lists/pings',
           query: {
             where: JSON.stringify({ lastName: 'Doe' })
-          }
-        });
-
-        await new Promise(resolve => {
-          server.stream.once('end', () => {
-            resolve();
-          });
-
-          server.stream.resume();
-        });
-      });
-
-      test('attaches the authenticated user to the where clause.', async () => {
-        const ownerId = uuid();
-
-        app.api.read = async function ({ query: { where }}) {
-          assert.that(where).is.equalTo({
-            $and: [
-              { lastName: 'Doe' },
-              { $or: [
-                { 'isAuthorized.owner': ownerId },
-                { 'isAuthorized.forPublic': true },
-                { 'isAuthorized.forAuthenticated': true }
-              ]}
-            ]
-          });
-
-          const fakeStream = new PassThrough({ objectMode: true });
-
-          fakeStream.end();
-
-          return fakeStream;
-        };
-
-        const server = await jsonLinesClient({
-          protocol: 'http',
-          host: 'localhost',
-          port,
-          path: '/v1/read/lists/pings',
-          query: {
-            where: JSON.stringify({ lastName: 'Doe' })
-          },
-          headers: {
-            authorization: `Bearer ${issueToken(ownerId)}`
           }
         });
 
@@ -729,15 +677,7 @@ suite('Server', () => {
 
       test('falls back to an empty where if where is missing.', async () => {
         app.api.read = async function ({ query: { where }}) {
-          assert.that(where).is.equalTo({
-            $and: [
-              {},
-              { $or: [
-                { 'isAuthorized.owner': 'anonymous' },
-                { 'isAuthorized.forPublic': true }
-              ]}
-            ]
-          });
+          assert.that(where).is.equalTo({});
 
           const fakeStream = new PassThrough({ objectMode: true });
 
