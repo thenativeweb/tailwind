@@ -342,7 +342,7 @@ suite('wsServer', () => {
 
     suite('v1/subscribeEvents', () => {
       test('receives an event from the app.api.outgoing stream.', async () => {
-        app.api.willPublishEvent = function ({ event }) {
+        app.api.prepareEventForForwarding = function ({ event }) {
           return event;
         };
 
@@ -390,7 +390,7 @@ suite('wsServer', () => {
       });
 
       test('receives multiple events from the app.api.outgoing stream.', async () => {
-        app.api.willPublishEvent = function ({ event }) {
+        app.api.prepareEventForForwarding = function ({ event }) {
           return event;
         };
 
@@ -445,7 +445,7 @@ suite('wsServer', () => {
       });
 
       test('receives filtered events from the app.api.outgoing stream.', async () => {
-        app.api.willPublishEvent = function ({ event }) {
+        app.api.prepareEventForForwarding = function ({ event }) {
           return event;
         };
 
@@ -500,7 +500,7 @@ suite('wsServer', () => {
         });
       });
 
-      suite('willPublishEvent', () => {
+      suite('prepareEventForForwarding', () => {
         test('is called with an event and metadata.', async () => {
           const procedureId = uuid();
 
@@ -510,7 +510,7 @@ suite('wsServer', () => {
 
           const joinedMetadata = { foo: 'bar' };
 
-          app.api.willPublishEvent = function ({ event, metadata }) {
+          app.api.prepareEventForForwarding = function ({ event, metadata }) {
             assert.that(event.data).is.equalTo({ participant: 'Jane Doe' });
             assert.that(metadata.foo).is.equalTo('bar');
             assert.that(metadata.client).is.ofType('object');
@@ -563,8 +563,8 @@ suite('wsServer', () => {
           });
         });
 
-        test('does not filter events if willPublishEvent returns an event.', async () => {
-          app.api.willPublishEvent = function ({ event }) {
+        test('does not filter events if prepareEventForForwarding returns an event.', async () => {
+          app.api.prepareEventForForwarding = function ({ event }) {
             return event;
           };
 
@@ -614,8 +614,8 @@ suite('wsServer', () => {
           });
         });
 
-        test('filters events if willPublishEvent does not return an event.', async () => {
-          app.api.willPublishEvent = function ({ event }) {
+        test('filters events if prepareEventForForwarding does not return an event.', async () => {
+          app.api.prepareEventForForwarding = function ({ event }) {
             if (event.name === 'started') {
               return;
             }
@@ -674,8 +674,8 @@ suite('wsServer', () => {
           });
         });
 
-        test('filters events if willPublishEvent throws an error.', async () => {
-          app.api.willPublishEvent = function ({ event }) {
+        test('filters events if prepareEventForForwarding throws an error.', async () => {
+          app.api.prepareEventForForwarding = function ({ event }) {
             if (event.name === 'started') {
               throw new Error('Will publish event failed.');
             }
