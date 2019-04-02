@@ -677,7 +677,7 @@ suite('wsServer', () => {
         test('filters events if prepareEventForForwarding throws an error.', async () => {
           app.api.prepareEventForForwarding = function ({ event }) {
             if (event.name === 'started') {
-              throw new Error('Will publish event failed.');
+              throw new Error('Prepare event for forwarding failed.');
             }
 
             return event;
