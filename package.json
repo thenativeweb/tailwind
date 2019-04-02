@@ -21,7 +21,7 @@
     "app-root-path": "2.2.1",
     "async-retry": "1.2.3",
     "body-parser": "1.18.3",
-    "commands-events": "thenativeweb/commands-events#613ebf24c5f49212eba73c3c57f2d8326ad5ca38",
+    "commands-events": "thenativeweb/commands-events#cc950a242a8cb9a4407ba98587122ef0f78a4d13",
     "compression": "1.7.4",
     "content-type": "1.0.4",
     "cors": "2.8.5",
@@ -41,7 +41,7 @@
     "processenv": "1.1.0",
     "stethoskop": "1.0.0",
     "timer2": "1.0.0",
-    "uuidv4": "3.0.1",
+    "uuidv4": "4.0.0",
     "validate-value": "5.0.2",
     "ws": "6.2.1"
   },
