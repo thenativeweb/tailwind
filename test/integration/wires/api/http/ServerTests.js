@@ -933,15 +933,19 @@ suite('Server', () => {
         });
       });
 
-      test('passes the user to the app.api.read function.', async () => {
+      test('passes metadata to the app.api.read function.', async () => {
         const ownerId = uuid();
 
-        app.api.read = async function ({ user }) {
-          assert.that(user).is.atLeast({
-            id: ownerId,
-            token: {
-              iss: 'https://auth.thenativeweb.io',
-              sub: ownerId
+        app.api.read = async function ({ metadata }) {
+          assert.that(metadata).is.atLeast({
+            client: {
+              user: {
+                id: ownerId,
+                token: {
+                  iss: 'https://auth.thenativeweb.io',
+                  sub: ownerId
+                }
+              }
             }
           });
 
