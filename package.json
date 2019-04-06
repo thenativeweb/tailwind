@@ -37,6 +37,7 @@
     "lusca": "1.6.1",
     "morgan": "1.9.1",
     "nocache": "2.0.0",
+    "p-event": "4.1.0",
     "partof": "1.0.0",
     "processenv": "1.1.0",
     "stethoskop": "1.0.0",
