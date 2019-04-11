@@ -256,8 +256,31 @@ suite('WritableAggregate', () => {
             });
 
             assert.that(() => {
-              aggregate.api.forCommands.events.publish('joined');
+              aggregate.api.forCommands.events.publish('started');
             }).is.not.throwing();
+          });
+
+          test('throws an error if a schema is given and data does not match.', async () => {
+            const aggregateId = uuid();
+
+            const command = buildCommand('planning', 'peerGroup', aggregateId, 'join', {
+              participant: 'Jane Doe'
+            });
+
+            const token = { sub: '6db3ef6a-a607-40cc-8108-65e81816b320' };
+
+            command.addInitiator({ token });
+
+            const aggregate = new WritableAggregate({
+              writeModel,
+              context: { name: 'planning' },
+              aggregate: { name: 'peerGroup', id: aggregateId },
+              command
+            });
+
+            assert.that(() => {
+              aggregate.api.forCommands.events.publish('joined', {});
+            }).is.throwing('Missing required property: participant (at data.participant).');
           });
 
           test('creates a new event and adds it to the list of uncommitted events.', async () => {

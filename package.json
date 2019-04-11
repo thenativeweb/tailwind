@@ -52,7 +52,7 @@
     "common-tags": "1.8.0",
     "freeport-promise": "1.1.0",
     "json-lines-client": "1.0.1",
-    "needle": "2.2.4",
+    "needle": "2.3.0",
     "nodeenv": "1.0.0",
     "roboter": "4.0.4",
     "shelljs": "0.8.3"

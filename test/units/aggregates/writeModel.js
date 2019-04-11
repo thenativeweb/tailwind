@@ -41,7 +41,17 @@ const writeModel = {
             return true;
           }
         },
+
         joined: {
+          schema: {
+            type: 'object',
+            properties: {
+              participant: { type: 'string', minLength: 1 }
+            },
+            required: [ 'participant' ],
+            additionalProperties: false
+          },
+
           handle (peerGroup, event) {
             peerGroup.setState({
               participants: [ ...peerGroup.state.participants, event.data.participant ]
