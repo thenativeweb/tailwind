@@ -4,7 +4,7 @@ const assert = require('assertthat'),
       shell = require('shelljs'),
       uuid = require('uuidv4');
 
-const tailwind = require('../../../../src/tailwind'),
+const tailwind = require('../../../../lib/tailwind'),
       waitForRabbitMq = require('../../../shared/waitForRabbitMq');
 
 suite('commandbus', () => {
@@ -37,21 +37,29 @@ suite('commandbus', () => {
         data: { foo: 'foobar' }
       });
 
-      appReceiver.commandbus.incoming.once('data', actual => {
-        actual.next();
-        assert.that(actual.context.name).is.equalTo(command.context.name);
-        assert.that(actual.aggregate.name).is.equalTo(command.aggregate.name);
-        assert.that(actual.aggregate.id).is.equalTo(command.aggregate.id);
-        assert.that(actual.name).is.equalTo(command.name);
-        assert.that(actual.id).is.equalTo(command.id);
-        assert.that(actual.data).is.equalTo(command.data);
-        assert.that(actual.metadata.correlationId).is.equalTo(command.metadata.correlationId);
-        assert.that(actual.metadata.causationId).is.equalTo(command.metadata.causationId);
-        assert.that(actual.metadata.timestamp).is.equalTo(command.metadata.timestamp);
+      const metadata = { foo: 'bar' };
+
+      appReceiver.commandbus.incoming.once('data', message => {
+        const receivedCommand = message.command,
+              receivedMetadata = message.metadata;
+
+        message.actions.next();
+
+        assert.that(receivedCommand.context.name).is.equalTo(command.context.name);
+        assert.that(receivedCommand.aggregate.name).is.equalTo(command.aggregate.name);
+        assert.that(receivedCommand.aggregate.id).is.equalTo(command.aggregate.id);
+        assert.that(receivedCommand.name).is.equalTo(command.name);
+        assert.that(receivedCommand.id).is.equalTo(command.id);
+        assert.that(receivedCommand.data).is.equalTo(command.data);
+        assert.that(receivedCommand.metadata.correlationId).is.equalTo(command.metadata.correlationId);
+        assert.that(receivedCommand.metadata.causationId).is.equalTo(command.metadata.causationId);
+        assert.that(receivedCommand.metadata.timestamp).is.equalTo(command.metadata.timestamp);
+
+        assert.that(receivedMetadata).is.equalTo(metadata);
         done();
       });
 
-      appSender.commandbus.outgoing.write(command);
+      appSender.commandbus.outgoing.write({ command, metadata });
     });
 
     suite('incoming', () => {

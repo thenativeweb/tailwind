@@ -2,7 +2,7 @@
 
 const assert = require('assertthat');
 
-const tailwind = require('../../src/tailwind');
+const tailwind = require('../../lib/tailwind');
 
 suite('tailwind', () => {
   suiteSetup(() => {

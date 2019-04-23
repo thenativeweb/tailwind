@@ -6,7 +6,7 @@ const assert = require('assertthat'),
       nodeenv = require('nodeenv'),
       uuid = require('uuidv4');
 
-const TailwindApp = require('../../src/TailwindApp');
+const TailwindApp = require('../../lib/TailwindApp');
 
 suite('TailwindApp', () => {
   test('is a function.', async () => {
@@ -238,6 +238,22 @@ suite('TailwindApp', () => {
         });
         /* eslint-enable no-new */
       }).is.throwing(ex => ex.code === 'ENOENT');
+    });
+  });
+
+  suite('ReadableAggregate', () => {
+    test('is a function.', async () => {
+      const app = new TailwindApp();
+
+      assert.that(app.ReadableAggregate).is.ofType('function');
+    });
+  });
+
+  suite('WritableAggregate', () => {
+    test('is a function.', async () => {
+      const app = new TailwindApp();
+
+      assert.that(app.WritableAggregate).is.ofType('function');
     });
   });
 

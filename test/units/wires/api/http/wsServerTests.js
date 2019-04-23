@@ -2,7 +2,7 @@
 
 const assert = require('assertthat');
 
-const wsServer = require('../../../../../src/wires/api/http/wsServer');
+const wsServer = require('../../../../../lib/wires/api/http/wsServer');
 
 suite('wsServer', () => {
   test('is a function.', async () => {

@@ -1,6 +1,6 @@
 'use strict';
 
-const tailwind = require('../../../../../src/tailwind');
+const tailwind = require('../../../../../lib/tailwind');
 
 const startApp = async function ({ port, corsOrigin }) {
   const app = tailwind.createApp();

@@ -2,7 +2,7 @@
 
 const path = require('path');
 
-const tailwind = require('../../../../../src/tailwind');
+const tailwind = require('../../../../../lib/tailwind');
 
 const startApp = async function ({ port, corsOrigin, serveStatic }) {
   const app = tailwind.createApp({
@@ -22,8 +22,19 @@ const startApp = async function ({ port, corsOrigin, serveStatic }) {
     writeModel: {
       network: {
         node: {
-          commands: { ping: {}},
-          events: { pinged: {}}
+          commands: {
+            ping: {
+              schema: {
+                type: 'object',
+                properties: {},
+                required: [],
+                additionalProperties: true
+              }
+            }
+          },
+          events: {
+            pinged: {}
+          }
         }
       }
     },

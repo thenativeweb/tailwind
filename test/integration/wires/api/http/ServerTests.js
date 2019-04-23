@@ -4,9 +4,9 @@ const { PassThrough } = require('stream'),
       path = require('path');
 
 const assert = require('assertthat'),
+      freeport = require('freeport-promise'),
       jsonLinesClient = require('json-lines-client'),
       needle = require('needle'),
-      nodeenv = require('nodeenv'),
       uuid = require('uuidv4');
 
 const buildEvent = require('../../../../shared/buildEvent'),
@@ -14,64 +14,46 @@ const buildEvent = require('../../../../shared/buildEvent'),
       startApp = require('./startApp');
 
 suite('Server', () => {
-  let restoreEnvironmentVariables;
-
-  suiteSetup(() => {
-    // Disable SSL certificate checks to allow running these tests with a
-    // self-signed certificate.
-    restoreEnvironmentVariables = nodeenv('NODE_TLS_REJECT_UNAUTHORIZED', '0');
-  });
-
-  suiteTeardown(() => {
-    restoreEnvironmentVariables();
-  });
-
   suite('routes', () => {
-    let app;
+    let app,
+        port;
 
-    suiteSetup(async () => {
-      app = await startApp({ port: 3000, corsOrigin: '*' });
+    setup(async () => {
+      port = await freeport();
+      app = await startApp({ port, corsOrigin: '*' });
     });
 
     test('delivers the correct CORS headers.', async () => {
-      const corsOrigins = {
-        3001: {
+      const corsOrigins = [
+        {
           origin: 'http://www.thenativeweb.io',
           allow: '*',
           expected: '*'
-        },
-        3002: {
+        }, {
           origin: 'http://www.thenativeweb.io',
           allow: 'http://www.thenativeweb.io',
           expected: 'http://www.thenativeweb.io'
-        },
-        3003: {
+        }, {
           origin: 'http://www.thenativeweb.io',
           allow: /\.thenativeweb\.io$/,
           expected: 'http://www.thenativeweb.io'
-        },
-        3004: {
+        }, {
           origin: 'http://www.example.com',
           allow: /\.thenativeweb\.io$/,
           expected: undefined
-        },
-        3005: {
+        }, {
           origin: 'http://www.thenativeweb.io',
           allow: [ 'http://www.thenativeweb.io', 'http://www.example.com' ],
           expected: 'http://www.thenativeweb.io'
-        },
-        3006: {
+        }, {
           origin: 'http://www.example.com',
           allow: 'http://www.thenativeweb.io',
           expected: undefined
         }
-      };
+      ];
 
-      const ports = Object.keys(corsOrigins);
-
-      for (let i = 0; i < ports.length; i++) {
-        const port = ports[i];
-        const corsOrigin = corsOrigins[port];
+      for (const corsOrigin of corsOrigins) {
+        port = await freeport();
 
         await startApp({ port, corsOrigin: corsOrigin.allow });
 
@@ -91,19 +73,19 @@ suite('Server', () => {
 
     suite('GET /v1/ping', () => {
       test('returns 200.', async () => {
-        const res = await needle('get', 'http://localhost:3000/v1/ping');
+        const res = await needle('get', `http://localhost:${port}/v1/ping`);
 
         assert.that(res.statusCode).is.equalTo(200);
       });
 
       test('returns application/json.', async () => {
-        const res = await needle('get', 'http://localhost:3000/v1/ping');
+        const res = await needle('get', `http://localhost:${port}/v1/ping`);
 
         assert.that(res.headers['content-type']).is.equalTo('application/json; charset=utf-8');
       });
 
       test('answers with api version v1.', async () => {
-        const res = await needle('get', 'http://localhost:3000/v1/ping');
+        const res = await needle('get', `http://localhost:${port}/v1/ping`);
 
         assert.that(res.body).is.equalTo({ api: 'v1' });
       });
@@ -111,26 +93,37 @@ suite('Server', () => {
 
     suite('GET /v1/configuration.json', () => {
       test('returns 200.', async () => {
-        const res = await needle('get', 'http://localhost:3000/v1/configuration.json');
+        const res = await needle('get', `http://localhost:${port}/v1/configuration.json`);
 
         assert.that(res.statusCode).is.equalTo(200);
       });
 
       test('returns text/javascript.', async () => {
-        const res = await needle('get', 'http://localhost:3000/v1/configuration.json');
+        const res = await needle('get', `http://localhost:${port}/v1/configuration.json`);
 
         assert.that(res.headers['content-type']).is.equalTo('application/json; charset=utf-8');
       });
 
       test('serves the application configuration.', async () => {
-        const res = await needle('get', 'http://localhost:3000/v1/configuration.json');
+        const res = await needle('get', `http://localhost:${port}/v1/configuration.json`);
 
         assert.that(res.body).is.ofType('object');
         assert.that(res.body.writeModel).is.equalTo({
           network: {
             node: {
-              commands: { ping: {}},
-              events: { pinged: {}}
+              commands: {
+                ping: {
+                  schema: {
+                    type: 'object',
+                    properties: {},
+                    required: [],
+                    additionalProperties: true
+                  }
+                }
+              },
+              events: {
+                pinged: {}
+              }
             }
           }
         });
@@ -144,14 +137,14 @@ suite('Server', () => {
 
     suite('POST /v1/command', () => {
       test('returns 415 if the content-type header is missing.', async () => {
-        const res = await needle('post', 'http://localhost:3000/v1/command', 'foobar');
+        const res = await needle('post', `http://localhost:${port}/v1/command`, 'foobar');
 
         assert.that(res.statusCode).is.equalTo(415);
         assert.that(res.body).is.equalTo('Header content-type must be application/json.');
       });
 
       test('returns 415 if content-type is not set to application/json.', async () => {
-        const res = await needle('post', 'http://localhost:3000/v1/command', 'foobar', {
+        const res = await needle('post', `http://localhost:${port}/v1/command`, 'foobar', {
           headers: {
             'content-type': 'text/plain'
           },
@@ -163,7 +156,7 @@ suite('Server', () => {
       });
 
       test('returns 400 if a malformed command is sent.', async () => {
-        const res = await needle('post', 'http://localhost:3000/v1/command', {
+        const res = await needle('post', `http://localhost:${port}/v1/command`, {
           foo: 'bar'
         }, {
           json: true
@@ -181,7 +174,7 @@ suite('Server', () => {
           data: { foo: 'foobar' }
         });
 
-        const res = await needle('post', 'http://localhost:3000/v1/command', command, {
+        const res = await needle('post', `http://localhost:${port}/v1/command`, command, {
           json: true
         });
 
@@ -197,7 +190,7 @@ suite('Server', () => {
           data: { foo: 'foobar' }
         });
 
-        const res = await needle('post', 'http://localhost:3000/v1/command', command, {
+        const res = await needle('post', `http://localhost:${port}/v1/command`, command, {
           json: true
         });
 
@@ -213,7 +206,7 @@ suite('Server', () => {
           data: { foo: 'foobar' }
         });
 
-        const res = await needle('post', 'http://localhost:3000/v1/command', command, {
+        const res = await needle('post', `http://localhost:${port}/v1/command`, command, {
           json: true
         });
 
@@ -236,7 +229,7 @@ suite('Server', () => {
 
           (async () => {
             try {
-              const res = await needle('post', 'http://localhost:3000/v1/command', command, {
+              const res = await needle('post', `http://localhost:${port}/v1/command`, command, {
                 json: true
               });
 
@@ -257,23 +250,33 @@ suite('Server', () => {
         });
 
         await new Promise((resolve, reject) => {
-          app.api.incoming.once('data', actual => {
+          app.api.incoming.once('data', message => {
+            const receivedCommand = message.command,
+                  receivedMetadata = message.metadata;
+
             try {
-              assert.that(actual.context.name).is.equalTo(command.context.name);
-              assert.that(actual.aggregate.name).is.equalTo(command.aggregate.name);
-              assert.that(actual.aggregate.id).is.equalTo(command.aggregate.id);
-              assert.that(actual.name).is.equalTo(command.name);
-              assert.that(actual.data).is.equalTo(command.data);
-              assert.that(actual.user.id).is.equalTo('anonymous');
-              assert.that(actual.user.token.sub).is.equalTo('anonymous');
-              assert.that(actual.user.token.iss).is.equalTo('https://token.invalid');
+              assert.that(receivedCommand.context.name).is.equalTo(command.context.name);
+              assert.that(receivedCommand.aggregate.name).is.equalTo(command.aggregate.name);
+              assert.that(receivedCommand.aggregate.id).is.equalTo(command.aggregate.id);
+              assert.that(receivedCommand.name).is.equalTo(command.name);
+              assert.that(receivedCommand.data).is.equalTo(command.data);
+              assert.that(receivedCommand.initiator.id).is.equalTo('anonymous');
+              assert.that(receivedCommand.initiator.token.sub).is.equalTo('anonymous');
+              assert.that(receivedCommand.initiator.token.iss).is.equalTo('https://token.invalid');
+
+              assert.that(receivedMetadata.client).is.ofType('object');
+              assert.that(receivedMetadata.client.user).is.ofType('object');
+              assert.that(receivedMetadata.client.user.id).is.equalTo('anonymous');
+              assert.that(receivedMetadata.client.user.token).is.ofType('object');
+              assert.that(receivedMetadata.client.user.token.sub).is.equalTo('anonymous');
+              assert.that(receivedMetadata.client.ip).is.ofType('string');
             } catch (ex) {
               return reject(ex);
             }
             resolve();
           });
 
-          needle.post('http://localhost:3000/v1/command', command, {
+          needle.post(`http://localhost:${port}/v1/command`, command, {
             json: true
           });
         });
@@ -286,19 +289,21 @@ suite('Server', () => {
           participant: 'Jane Doe'
         });
 
+        app.api.prepareEventForForwarding = function ({ event }) {
+          return event;
+        };
+
         const server = await jsonLinesClient({
           protocol: 'http',
           host: 'localhost',
-          port: 3000,
+          port,
           path: '/v1/events'
         });
 
         await new Promise((resolve, reject) => {
           server.stream.once('data', event => {
             try {
-              assert.that(event.data).is.equalTo({
-                participant: 'Jane Doe'
-              });
+              assert.that(event.data).is.equalTo({ participant: 'Jane Doe' });
 
               server.disconnect();
             } catch (ex) {
@@ -307,11 +312,15 @@ suite('Server', () => {
             resolve();
           });
 
-          app.api.outgoing.write(joinedEvent);
+          app.api.outgoing.write({ event: joinedEvent, metadata: {}});
         });
       });
 
       test('receives multiple events from the app.api.outgoing stream.', async () => {
+        app.api.prepareEventForForwarding = function ({ event }) {
+          return event;
+        };
+
         const joinedEvent1 = buildEvent('planning', 'peerGroup', uuid(), 'joined', {
           participant: 'Jane Doe'
         });
@@ -322,7 +331,7 @@ suite('Server', () => {
         const server = await jsonLinesClient({
           protocol: 'http',
           host: 'localhost',
-          port: 3000,
+          port,
           path: '/v1/events'
         });
 
@@ -356,12 +365,16 @@ suite('Server', () => {
 
           server.stream.on('data', onData);
 
-          app.api.outgoing.write(joinedEvent1);
-          app.api.outgoing.write(joinedEvent2);
+          app.api.outgoing.write({ event: joinedEvent1, metadata: {}});
+          app.api.outgoing.write({ event: joinedEvent2, metadata: {}});
         });
       });
 
       test('receives filtered events from the app.api.outgoing stream.', async () => {
+        app.api.prepareEventForForwarding = function ({ event }) {
+          return event;
+        };
+
         const startedEvent = buildEvent('planning', 'peerGroup', uuid(), 'started', {
           participant: 'Jane Doe'
         });
@@ -372,7 +385,7 @@ suite('Server', () => {
         const server = await jsonLinesClient({
           protocol: 'http',
           host: 'localhost',
-          port: 3000,
+          port,
           path: '/v1/events',
           body: {
             name: 'joined'
@@ -394,27 +407,104 @@ suite('Server', () => {
             resolve();
           });
 
-          app.api.outgoing.write(startedEvent);
-          app.api.outgoing.write(joinedEvent);
+          app.api.outgoing.write({ event: startedEvent, metadata: {}});
+          app.api.outgoing.write({ event: joinedEvent, metadata: {}});
         });
       });
 
-      suite('filters events based on authorization options', () => {
-        test('sends public events to public users.', async () => {
-          const eventForPublic = buildEvent('planning', 'peerGroup', uuid(), 'joined', {
-            participant: 'John Doe'
+      suite('prepareEventForForwarding', () => {
+        test('is called with an event and metadata.', async () => {
+          const joinedEvent = buildEvent('planning', 'peerGroup', uuid(), 'joined', {
+            participant: 'Jane Doe'
           });
 
-          eventForPublic.metadata.isAuthorized = {
-            owner: uuid(),
-            forAuthenticated: true,
-            forPublic: true
+          const joinedMetadata = { foo: 'bar' };
+
+          app.api.prepareEventForForwarding = function ({ event, metadata }) {
+            assert.that(event.data).is.equalTo({ participant: 'Jane Doe' });
+            assert.that(metadata.foo).is.equalTo('bar');
+            assert.that(metadata.client).is.ofType('object');
+            assert.that(metadata.client.user).is.ofType('object');
+            assert.that(metadata.client.user.id).is.equalTo('anonymous');
+            assert.that(metadata.client.user.token).is.ofType('object');
+            assert.that(metadata.client.user.token.sub).is.equalTo('anonymous');
+            assert.that(metadata.client.ip).is.ofType('string');
+
+            return event;
           };
 
           const server = await jsonLinesClient({
             protocol: 'http',
             host: 'localhost',
-            port: 3000,
+            port,
+            path: '/v1/events'
+          });
+
+          await new Promise(resolve => {
+            server.stream.once('data', () => {
+              server.disconnect();
+              resolve();
+            });
+
+            app.api.outgoing.write({ event: joinedEvent, metadata: joinedMetadata });
+          });
+        });
+
+        test('does not filter events if prepareEventForForwarding returns an event.', async () => {
+          app.api.prepareEventForForwarding = function ({ event }) {
+            return event;
+          };
+
+          const event = buildEvent('planning', 'peerGroup', uuid(), 'joined', {
+            participant: 'John Doe'
+          });
+
+          const server = await jsonLinesClient({
+            protocol: 'http',
+            host: 'localhost',
+            port,
+            path: '/v1/events'
+          });
+
+          await new Promise((resolve, reject) => {
+            server.stream.once('data', receivedEvent => {
+              try {
+                assert.that(receivedEvent.data).is.equalTo({
+                  participant: 'John Doe'
+                });
+
+                server.disconnect();
+              } catch (ex) {
+                return reject(ex);
+              }
+              resolve();
+            });
+
+            app.api.outgoing.write({ event, metadata: {}});
+          });
+        });
+
+        test('filters events if prepareEventForForwarding does not return an event.', async () => {
+          app.api.prepareEventForForwarding = function ({ event }) {
+            if (event.name === 'started') {
+              return;
+            }
+
+            return event;
+          };
+
+          const eventStarted = buildEvent('planning', 'peerGroup', uuid(), 'started', {
+            initiator: 'Jane Doe',
+            destination: 'Riva'
+          });
+          const eventJoined = buildEvent('planning', 'peerGroup', uuid(), 'joined', {
+            participant: 'John Doe'
+          });
+
+          const server = await jsonLinesClient({
+            protocol: 'http',
+            host: 'localhost',
+            port,
             path: '/v1/events'
           });
 
@@ -432,115 +522,32 @@ suite('Server', () => {
               resolve();
             });
 
-            app.api.outgoing.write(eventForPublic);
+            app.api.outgoing.write({ event: eventStarted, metadata: {}});
+            app.api.outgoing.write({ event: eventJoined, metadata: {}});
           });
         });
 
-        test('sends public events to authenticated users.', async () => {
-          const eventForPublic = buildEvent('planning', 'peerGroup', uuid(), 'joined', {
-            participant: 'John Doe'
-          });
-
-          eventForPublic.metadata.isAuthorized = {
-            owner: uuid(),
-            forAuthenticated: true,
-            forPublic: true
-          };
-
-          const server = await jsonLinesClient({
-            protocol: 'http',
-            host: 'localhost',
-            port: 3000,
-            path: '/v1/events',
-            headers: {
-              authorization: `Bearer ${issueToken('Jane Doe')}`
+        test('filters events if prepareEventForForwarding throws an error.', async () => {
+          app.api.prepareEventForForwarding = function ({ event }) {
+            if (event.name === 'started') {
+              throw new Error('Prepare event for forwarding failed.');
             }
+
+            return event;
+          };
+
+          const eventStarted = buildEvent('planning', 'peerGroup', uuid(), 'started', {
+            initiator: 'Jane Doe',
+            destination: 'Riva'
           });
-
-          await new Promise((resolve, reject) => {
-            server.stream.once('data', event => {
-              try {
-                assert.that(event.data).is.equalTo({
-                  participant: 'John Doe'
-                });
-
-                server.disconnect();
-              } catch (ex) {
-                return reject(ex);
-              }
-              resolve();
-            });
-
-            app.api.outgoing.write(eventForPublic);
-          });
-        });
-
-        test('sends public events to owners.', async () => {
-          const ownerId = uuid();
-
-          const eventForPublic = buildEvent('planning', 'peerGroup', uuid(), 'joined', {
+          const eventJoined = buildEvent('planning', 'peerGroup', uuid(), 'joined', {
             participant: 'John Doe'
           });
-
-          eventForPublic.metadata.isAuthorized = {
-            owner: ownerId,
-            forAuthenticated: true,
-            forPublic: true
-          };
 
           const server = await jsonLinesClient({
             protocol: 'http',
             host: 'localhost',
-            port: 3000,
-            path: '/v1/events',
-            headers: {
-              authorization: `Bearer ${issueToken(ownerId)}`
-            }
-          });
-
-          await new Promise((resolve, reject) => {
-            server.stream.once('data', event => {
-              try {
-                assert.that(event.data).is.equalTo({
-                  participant: 'John Doe'
-                });
-
-                server.disconnect();
-              } catch (ex) {
-                return reject(ex);
-              }
-              resolve();
-            });
-
-            app.api.outgoing.write(eventForPublic);
-          });
-        });
-
-        test('does not send authenticated events to public users.', async () => {
-          const eventForAuthenticated = buildEvent('planning', 'peerGroup', uuid(), 'joined', {
-            participant: 'Jane Doe'
-          });
-
-          eventForAuthenticated.metadata.isAuthorized = {
-            owner: uuid(),
-            forAuthenticated: true,
-            forPublic: false
-          };
-
-          const eventForPublic = buildEvent('planning', 'peerGroup', uuid(), 'joined', {
-            participant: 'John Doe'
-          });
-
-          eventForPublic.metadata.isAuthorized = {
-            owner: uuid(),
-            forAuthenticated: true,
-            forPublic: true
-          };
-
-          const server = await jsonLinesClient({
-            protocol: 'http',
-            host: 'localhost',
-            port: 3000,
+            port,
             path: '/v1/events'
           });
 
@@ -558,230 +565,8 @@ suite('Server', () => {
               resolve();
             });
 
-            app.api.outgoing.write(eventForAuthenticated);
-            app.api.outgoing.write(eventForPublic);
-          });
-        });
-
-        test('sends authenticated events to authenticated users.', async () => {
-          const eventForAuthenticated = buildEvent('planning', 'peerGroup', uuid(), 'joined', {
-            participant: 'Jane Doe'
-          });
-
-          eventForAuthenticated.metadata.isAuthorized = {
-            owner: uuid(),
-            forAuthenticated: true,
-            forPublic: false
-          };
-
-          const server = await jsonLinesClient({
-            protocol: 'http',
-            host: 'localhost',
-            port: 3000,
-            path: '/v1/events',
-            headers: {
-              authorization: `Bearer ${issueToken('Jane Doe')}`
-            }
-          });
-
-          await new Promise((resolve, reject) => {
-            server.stream.once('data', event => {
-              try {
-                assert.that(event.data).is.equalTo({
-                  participant: 'Jane Doe'
-                });
-
-                server.disconnect();
-              } catch (ex) {
-                return reject(ex);
-              }
-              resolve();
-            });
-
-            app.api.outgoing.write(eventForAuthenticated);
-          });
-        });
-
-        test('sends authenticated events to owners.', async () => {
-          const ownerId = uuid();
-
-          const eventForAuthenticated = buildEvent('planning', 'peerGroup', uuid(), 'joined', {
-            participant: 'Jane Doe'
-          });
-
-          eventForAuthenticated.metadata.isAuthorized = {
-            owner: ownerId,
-            forAuthenticated: true,
-            forPublic: false
-          };
-
-          const server = await jsonLinesClient({
-            protocol: 'http',
-            host: 'localhost',
-            port: 3000,
-            path: '/v1/events',
-            headers: {
-              authorization: `Bearer ${issueToken(ownerId)}`
-            }
-          });
-
-          await new Promise((resolve, reject) => {
-            server.stream.once('data', event => {
-              try {
-                assert.that(event.data).is.equalTo({
-                  participant: 'Jane Doe'
-                });
-
-                server.disconnect();
-              } catch (ex) {
-                return reject(ex);
-              }
-              resolve();
-            });
-
-            app.api.outgoing.write(eventForAuthenticated);
-          });
-        });
-
-        test('does not send owner events to public users.', async () => {
-          const ownerId = uuid();
-
-          const eventForOwner = buildEvent('planning', 'peerGroup', uuid(), 'joined', {
-            participant: 'Jane Doe'
-          });
-
-          eventForOwner.metadata.isAuthorized = {
-            owner: ownerId,
-            forAuthenticated: false,
-            forPublic: false
-          };
-
-          const eventForPublic = buildEvent('planning', 'peerGroup', uuid(), 'joined', {
-            participant: 'John Doe'
-          });
-
-          eventForPublic.metadata.isAuthorized = {
-            owner: uuid(),
-            forAuthenticated: true,
-            forPublic: true
-          };
-
-          const server = await jsonLinesClient({
-            protocol: 'http',
-            host: 'localhost',
-            port: 3000,
-            path: '/v1/events'
-          });
-
-          await new Promise((resolve, reject) => {
-            server.stream.once('data', event => {
-              try {
-                assert.that(event.data).is.equalTo({
-                  participant: 'John Doe'
-                });
-
-                server.disconnect();
-              } catch (ex) {
-                return reject(ex);
-              }
-              resolve();
-            });
-
-            app.api.outgoing.write(eventForOwner);
-            app.api.outgoing.write(eventForPublic);
-          });
-        });
-
-        test('does not send owner events to authenticated users.', async () => {
-          const ownerId = uuid();
-
-          const eventForOwner = buildEvent('planning', 'peerGroup', uuid(), 'joined', {
-            participant: 'Jane Doe'
-          });
-
-          eventForOwner.metadata.isAuthorized = {
-            owner: ownerId,
-            forAuthenticated: false,
-            forPublic: false
-          };
-
-          const eventForPublic = buildEvent('planning', 'peerGroup', uuid(), 'joined', {
-            participant: 'John Doe'
-          });
-
-          eventForPublic.metadata.isAuthorized = {
-            owner: uuid(),
-            forAuthenticated: true,
-            forPublic: true
-          };
-
-          const server = await jsonLinesClient({
-            protocol: 'http',
-            host: 'localhost',
-            port: 3000,
-            path: '/v1/events',
-            headers: {
-              authorization: `Bearer ${issueToken('Jane Doe')}`
-            }
-          });
-
-          await new Promise((resolve, reject) => {
-            server.stream.once('data', event => {
-              try {
-                assert.that(event.data).is.equalTo({
-                  participant: 'John Doe'
-                });
-
-                server.disconnect();
-              } catch (ex) {
-                return reject(ex);
-              }
-              resolve();
-            });
-
-            app.api.outgoing.write(eventForOwner);
-            app.api.outgoing.write(eventForPublic);
-          });
-        });
-
-        test('sends owner events to owners.', async () => {
-          const ownerId = uuid();
-
-          const eventForOwner = buildEvent('planning', 'peerGroup', uuid(), 'joined', {
-            participant: 'Jane Doe'
-          });
-
-          eventForOwner.metadata.isAuthorized = {
-            owner: ownerId,
-            forAuthenticated: false,
-            forPublic: false
-          };
-
-          const server = await jsonLinesClient({
-            protocol: 'http',
-            host: 'localhost',
-            port: 3000,
-            path: '/v1/events',
-            headers: {
-              authorization: `Bearer ${issueToken(ownerId)}`
-            }
-          });
-
-          await new Promise((resolve, reject) => {
-            server.stream.once('data', event => {
-              try {
-                assert.that(event.data).is.equalTo({
-                  participant: 'Jane Doe'
-                });
-
-                server.disconnect();
-              } catch (ex) {
-                return reject(ex);
-              }
-              resolve();
-            });
-
-            app.api.outgoing.write(eventForOwner);
+            app.api.outgoing.write({ event: eventStarted, metadata: {}});
+            app.api.outgoing.write({ event: eventJoined, metadata: {}});
           });
         });
       });
@@ -793,7 +578,7 @@ suite('Server', () => {
           await jsonLinesClient({
             protocol: 'http',
             host: 'localhost',
-            port: 3000,
+            port,
             path: '/v1/read'
           });
         }).is.throwingAsync(ex => ex.code === 'ESTATUSCODEUNEXPECTED');
@@ -804,7 +589,7 @@ suite('Server', () => {
           await jsonLinesClient({
             protocol: 'http',
             host: 'localhost',
-            port: 3000,
+            port,
             path: '/v1/read/Lists'
           });
         }).is.throwingAsync(ex => ex.code === 'ESTATUSCODEUNEXPECTED');
@@ -815,7 +600,7 @@ suite('Server', () => {
           await jsonLinesClient({
             protocol: 'http',
             host: 'localhost',
-            port: 3000,
+            port,
             path: '/v1/read/non-existent/foo'
           });
         }).is.throwingAsync(ex => ex.code === 'ESTATUSCODEUNEXPECTED');
@@ -826,14 +611,14 @@ suite('Server', () => {
           await jsonLinesClient({
             protocol: 'http',
             host: 'localhost',
-            port: 3000,
+            port,
             path: '/v1/read/lists/foo'
           });
         }).is.throwingAsync(ex => ex.code === 'ESTATUSCODEUNEXPECTED');
       });
 
       test('passes the given model type and model name to the app.api.read function.', async () => {
-        app.api.read = async function (modelType, modelName) {
+        app.api.read = async function ({ modelType, modelName }) {
           assert.that(modelType).is.equalTo('lists');
           assert.that(modelName).is.equalTo('pings');
 
@@ -847,7 +632,7 @@ suite('Server', () => {
         const server = await jsonLinesClient({
           protocol: 'http',
           host: 'localhost',
-          port: 3000,
+          port,
           path: '/v1/read/lists/pings'
         });
 
@@ -861,16 +646,8 @@ suite('Server', () => {
       });
 
       test('passes the given where to the app.api.read function.', async () => {
-        app.api.read = async function (modelType, modelName, options) {
-          assert.that(options.where).is.equalTo({
-            $and: [
-              { lastName: 'Doe' },
-              { $or: [
-                { 'isAuthorized.owner': 'anonymous' },
-                { 'isAuthorized.forPublic': true }
-              ]}
-            ]
-          });
+        app.api.read = async function ({ query: { where }}) {
+          assert.that(where).is.equalTo({ lastName: 'Doe' });
 
           const fakeStream = new PassThrough({ objectMode: true });
 
@@ -882,54 +659,10 @@ suite('Server', () => {
         const server = await jsonLinesClient({
           protocol: 'http',
           host: 'localhost',
-          port: 3000,
+          port,
           path: '/v1/read/lists/pings',
           query: {
             where: JSON.stringify({ lastName: 'Doe' })
-          }
-        });
-
-        await new Promise(resolve => {
-          server.stream.once('end', () => {
-            resolve();
-          });
-
-          server.stream.resume();
-        });
-      });
-
-      test('attaches the authenticated user to the where clause.', async () => {
-        const ownerId = uuid();
-
-        app.api.read = async function (modelType, modelName, options) {
-          assert.that(options.where).is.equalTo({
-            $and: [
-              { lastName: 'Doe' },
-              { $or: [
-                { 'isAuthorized.owner': ownerId },
-                { 'isAuthorized.forPublic': true },
-                { 'isAuthorized.forAuthenticated': true }
-              ]}
-            ]
-          });
-
-          const fakeStream = new PassThrough({ objectMode: true });
-
-          fakeStream.end();
-
-          return fakeStream;
-        };
-
-        const server = await jsonLinesClient({
-          protocol: 'http',
-          host: 'localhost',
-          port: 3000,
-          path: '/v1/read/lists/pings',
-          query: {
-            where: JSON.stringify({ lastName: 'Doe' })
-          },
-          headers: {
-            authorization: `Bearer ${issueToken(ownerId)}`
           }
         });
 
@@ -943,16 +676,8 @@ suite('Server', () => {
       });
 
       test('falls back to an empty where if where is missing.', async () => {
-        app.api.read = async function (modelType, modelName, options) {
-          assert.that(options.where).is.equalTo({
-            $and: [
-              {},
-              { $or: [
-                { 'isAuthorized.owner': 'anonymous' },
-                { 'isAuthorized.forPublic': true }
-              ]}
-            ]
-          });
+        app.api.read = async function ({ query: { where }}) {
+          assert.that(where).is.equalTo({});
 
           const fakeStream = new PassThrough({ objectMode: true });
 
@@ -964,7 +689,7 @@ suite('Server', () => {
         const server = await jsonLinesClient({
           protocol: 'http',
           host: 'localhost',
-          port: 3000,
+          port,
           path: '/v1/read/lists/pings'
         });
 
@@ -978,8 +703,8 @@ suite('Server', () => {
       });
 
       test('passes the given order by to the app.api.read function.', async () => {
-        app.api.read = async function (modelType, modelName, options) {
-          assert.that(options.orderBy).is.equalTo({ lastName: 'ascending' });
+        app.api.read = async function ({ query: { orderBy }}) {
+          assert.that(orderBy).is.equalTo({ lastName: 'ascending' });
 
           const fakeStream = new PassThrough({ objectMode: true });
 
@@ -991,7 +716,7 @@ suite('Server', () => {
         const server = await jsonLinesClient({
           protocol: 'http',
           host: 'localhost',
-          port: 3000,
+          port,
           path: '/v1/read/lists/pings',
           query: {
             orderBy: JSON.stringify({ lastName: 'ascending' })
@@ -1008,8 +733,8 @@ suite('Server', () => {
       });
 
       test('falls back to an empty order by if order by is missing.', async () => {
-        app.api.read = async function (modelType, modelName, options) {
-          assert.that(options.orderBy).is.equalTo({});
+        app.api.read = async function ({ query: { orderBy }}) {
+          assert.that(orderBy).is.equalTo({});
 
           const fakeStream = new PassThrough({ objectMode: true });
 
@@ -1021,7 +746,7 @@ suite('Server', () => {
         const server = await jsonLinesClient({
           protocol: 'http',
           host: 'localhost',
-          port: 3000,
+          port,
           path: '/v1/read/lists/pings'
         });
 
@@ -1035,8 +760,8 @@ suite('Server', () => {
       });
 
       test('passes the given skip to the app.api.read function.', async () => {
-        app.api.read = async function (modelType, modelName, options) {
-          assert.that(options.skip).is.equalTo(23);
+        app.api.read = async function ({ query: { skip }}) {
+          assert.that(skip).is.equalTo(23);
 
           const fakeStream = new PassThrough({ objectMode: true });
 
@@ -1048,7 +773,7 @@ suite('Server', () => {
         const server = await jsonLinesClient({
           protocol: 'http',
           host: 'localhost',
-          port: 3000,
+          port,
           path: '/v1/read/lists/pings',
           query: {
             skip: 23
@@ -1065,8 +790,8 @@ suite('Server', () => {
       });
 
       test('falls back to skip=0 if skip is missing.', async () => {
-        app.api.read = async function (modelType, modelName, options) {
-          assert.that(options.skip).is.equalTo(0);
+        app.api.read = async function ({ query: { skip }}) {
+          assert.that(skip).is.equalTo(0);
 
           const fakeStream = new PassThrough({ objectMode: true });
 
@@ -1078,7 +803,7 @@ suite('Server', () => {
         const server = await jsonLinesClient({
           protocol: 'http',
           host: 'localhost',
-          port: 3000,
+          port,
           path: '/v1/read/lists/pings'
         });
 
@@ -1092,8 +817,8 @@ suite('Server', () => {
       });
 
       test('falls back to skip=0 if skip is invalid.', async () => {
-        app.api.read = async function (modelType, modelName, options) {
-          assert.that(options.skip).is.equalTo(0);
+        app.api.read = async function ({ query: { skip }}) {
+          assert.that(skip).is.equalTo(0);
 
           const fakeStream = new PassThrough({ objectMode: true });
 
@@ -1105,7 +830,7 @@ suite('Server', () => {
         const server = await jsonLinesClient({
           protocol: 'http',
           host: 'localhost',
-          port: 3000,
+          port,
           path: '/v1/read/lists/pings',
           query: {
             skip: 'abc'
@@ -1122,8 +847,8 @@ suite('Server', () => {
       });
 
       test('passes the given take to the app.api.read function.', async () => {
-        app.api.read = async function (modelType, modelName, options) {
-          assert.that(options.take).is.equalTo(23);
+        app.api.read = async function ({ query: { take }}) {
+          assert.that(take).is.equalTo(23);
 
           const fakeStream = new PassThrough({ objectMode: true });
 
@@ -1135,7 +860,7 @@ suite('Server', () => {
         const server = await jsonLinesClient({
           protocol: 'http',
           host: 'localhost',
-          port: 3000,
+          port,
           path: '/v1/read/lists/pings',
           query: {
             take: 23
@@ -1152,8 +877,8 @@ suite('Server', () => {
       });
 
       test('falls back to take=100 if take is missing.', async () => {
-        app.api.read = async function (modelType, modelName, options) {
-          assert.that(options.take).is.equalTo(100);
+        app.api.read = async function ({ query: { take }}) {
+          assert.that(take).is.equalTo(100);
 
           const fakeStream = new PassThrough({ objectMode: true });
 
@@ -1165,7 +890,7 @@ suite('Server', () => {
         const server = await jsonLinesClient({
           protocol: 'http',
           host: 'localhost',
-          port: 3000,
+          port,
           path: '/v1/read/lists/pings'
         });
 
@@ -1179,8 +904,8 @@ suite('Server', () => {
       });
 
       test('falls back to take=100 if take is invalid.', async () => {
-        app.api.read = async function (modelType, modelName, options) {
-          assert.that(options.take).is.equalTo(100);
+        app.api.read = async function ({ query: { take }}) {
+          assert.that(take).is.equalTo(100);
 
           const fakeStream = new PassThrough({ objectMode: true });
 
@@ -1192,7 +917,7 @@ suite('Server', () => {
         const server = await jsonLinesClient({
           protocol: 'http',
           host: 'localhost',
-          port: 3000,
+          port,
           path: '/v1/read/lists/pings',
           query: {
             take: 'abc'
@@ -1208,15 +933,19 @@ suite('Server', () => {
         });
       });
 
-      test('passes the user to the app.api.read function.', async () => {
+      test('passes metadata to the app.api.read function.', async () => {
         const ownerId = uuid();
 
-        app.api.read = async function (modelType, modelName, { user }) {
-          assert.that(user).is.atLeast({
-            id: ownerId,
-            token: {
-              iss: 'https://auth.thenativeweb.io',
-              sub: ownerId
+        app.api.read = async function ({ metadata }) {
+          assert.that(metadata).is.atLeast({
+            client: {
+              user: {
+                id: ownerId,
+                token: {
+                  iss: 'https://auth.thenativeweb.io',
+                  sub: ownerId
+                }
+              }
             }
           });
 
@@ -1230,7 +959,7 @@ suite('Server', () => {
         const server = await jsonLinesClient({
           protocol: 'http',
           host: 'localhost',
-          port: 3000,
+          port,
           path: '/v1/read/lists/pings',
           query: {
             where: JSON.stringify({ lastName: 'Doe' })
@@ -1254,7 +983,7 @@ suite('Server', () => {
           await jsonLinesClient({
             protocol: 'http',
             host: 'localhost',
-            port: 3000,
+            port,
             path: '/v1/read/lists/pings',
             query: {
               where: 'foo'
@@ -1268,7 +997,7 @@ suite('Server', () => {
           await jsonLinesClient({
             protocol: 'http',
             host: 'localhost',
-            port: 3000,
+            port,
             path: '/v1/read/lists/pings',
             query: {
               orderBy: 'foo'
@@ -1286,7 +1015,7 @@ suite('Server', () => {
           await jsonLinesClient({
             protocol: 'http',
             host: 'localhost',
-            port: 3000,
+            port,
             path: '/v1/read/lists/pings'
           });
         }).is.throwingAsync(ex => ex.code === 'ESTATUSCODEUNEXPECTED');
@@ -1305,7 +1034,7 @@ suite('Server', () => {
         const server = await jsonLinesClient({
           protocol: 'http',
           host: 'localhost',
-          port: 3000,
+          port,
           path: '/v1/read/lists/pings'
         });
 
@@ -1335,7 +1064,7 @@ suite('Server', () => {
         const server = await jsonLinesClient({
           protocol: 'http',
           host: 'localhost',
-          port: 3000,
+          port,
           path: '/v1/read/lists/pings'
         });
 
@@ -1376,7 +1105,7 @@ suite('Server', () => {
         const server = await jsonLinesClient({
           protocol: 'http',
           host: 'localhost',
-          port: 3000,
+          port,
           path: '/v1/read/lists/pings'
         });
 
