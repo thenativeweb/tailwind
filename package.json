@@ -28,7 +28,7 @@
     "crypto2": "2.0.0",
     "datasette": "1.0.1",
     "draht": "1.0.1",
-    "express": "4.16.4 ",
+    "express": "4.17.3 ",
     "flaschenpost": "2.0.0",
     "hase": "2.0.1",
     "json-lines": "1.0.0",
